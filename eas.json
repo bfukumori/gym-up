@@ -19,17 +19,11 @@
       },
       "ios": {
         "simulator": true
-      },
-      "env": {
-        "EXPO_PUBLIC_GEMINI_API_KEY": "${EXPO_PUBLIC_GEMINI_API_KEY}"
       }
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production",
-      "env": {
-        "EXPO_PUBLIC_GEMINI_API_KEY": "${EXPO_PUBLIC_GEMINI_API_KEY}"
-      }
+      "channel": "production"
     }
   },
   "submit": {
