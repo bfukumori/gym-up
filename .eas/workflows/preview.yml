@@ -1,4 +1,8 @@
 name: Create preview builds
+
+on:
+  workflow_dispatch:
+
 jobs:
   android_preview_build:
     name: Build Android
@@ -6,6 +10,7 @@ jobs:
     params:
       platform: android
       profile: preview
+
   ios_device_preview_build:
     name: Build iOS device
     type: build

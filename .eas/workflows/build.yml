@@ -1,4 +1,8 @@
 name: Create development builds
+
+on:
+  workflow_dispatch:
+
 jobs:
   android_development_build:
     name: Build Android
@@ -6,6 +10,7 @@ jobs:
     params:
       platform: android
       profile: development
+
   ios_device_development_build:
     name: Build iOS device
     type: build
