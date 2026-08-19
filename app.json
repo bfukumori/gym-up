@@ -12,7 +12,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#0B0E14"
     },
-    "plugins": ["expo-router"],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/94b18bb2-7e0b-44e1-9707-39c09eb852d9"
+    },
+    "plugins": ["expo-router", "expo-updates"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bfukumori.gymup"

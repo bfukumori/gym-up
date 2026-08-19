@@ -123,13 +123,14 @@ pnpm start
 | `pnpm lint` | Executa a verificação de regras de código com Biome |
 | `pnpm format` | Formata todos os arquivos do projeto com Biome |
 | `pnpm check` | Executa lint e formatação juntos aplicando correções automáticas |
-| `pnpm tsc --noEmit` | Verifica tipagem estrita do TypeScript (0 erros) |
+| `pnpm update:preview` | Envia atualização OTA instantânea para o canal preview |
+| `pnpm update:prod` | Envia atualização OTA instantânea para o canal produção |
 
 ---
 
-## ☁️ EAS CI/CD, Variáveis de Ambiente & Preview Workflows
+## ☁️ EAS CI/CD, Variáveis de Ambiente, Preview & EAS Update
 
-O Gym-Up está configurado para automação de builds com o **EAS (Expo Application Services)**:
+O Gym-Up está configurado para automação de builds e atualizações Over-The-Air (OTA) com o **EAS (Expo Application Services)**:
 
 ### 1. Configuração de Variáveis de Ambiente no EAS
 Para que suas variáveis (como `EXPO_PUBLIC_GEMINI_API_KEY`) sejam injetadas com segurança nos builds em nuvem:
@@ -154,7 +155,18 @@ npx eas-cli@latest build --platform android --profile preview
 npx eas-cli@latest build --platform ios --profile preview
 ```
 
-### 3. Workflows Automáticos ([.eas/workflows/preview.yml](.eas/workflows/preview.yml))
+### 3. Atualizações Instantâneas sem Recompilar (EAS Update / OTA)
+Envie ajustes e correções para o app já instalado sem precisar gerar novos builds no EAS:
+
+```bash
+# Publicar update instantâneo para o app de Preview
+pnpm update:preview
+
+# Publicar update para o app de Produção
+pnpm update:prod
+```
+
+### 4. Workflows Automáticos ([.eas/workflows/preview.yml](.eas/workflows/preview.yml))
 Ao abrir um Pull Request para a branch `main` ou disparar manualmente via `workflow_dispatch`, o EAS executa os builds de preview em paralelo na nuvem automaticamente.
 
 ---
