@@ -41,7 +41,7 @@
 - **Gerenciador de Pacotes**: [pnpm](https://pnpm.io/)
 - **Linter & Formatter**: [Biome](https://biomejs.dev/)
 - **Inteligência Artificial**: [Google Gen AI SDK / REST API](https://aistudio.google.com/)
-- **Armazenamento Local**: `@react-native-async-storage/async-storage`
+- **Armazenamento Seguro**: `expo-secure-store` (criptografia de hardware Keychain/KeyStore para chaves) e `@react-native-async-storage/async-storage` (histórico e treinos)
 - **Feedback Tátil**: `expo-haptics`
 - **Ícones**: `@expo/vector-icons` (Ionicons) e `lucide-react-native`
 

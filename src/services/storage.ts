@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { INITIAL_ACHIEVEMENTS } from '../constants/achievements';
 import type { Achievement, UserStats, WorkoutPlan, WorkoutSessionLog } from '../types';
 
@@ -7,8 +8,11 @@ const KEYS = {
   SESSION_LOGS: '@gymup_session_logs',
   USER_STATS: '@gymup_user_stats',
   ACHIEVEMENTS: '@gymup_achievements',
-  CUSTOM_API_KEY: '@gymup_custom_gemini_api_key',
   LAST_ACTIVE_DAY: '@gymup_last_active_day',
+};
+
+const SECURE_KEYS = {
+  CUSTOM_API_KEY: 'gymup_custom_gemini_api_key',
 };
 
 const DEFAULT_STATS: UserStats = {
@@ -64,8 +68,8 @@ export const StorageService = {
 
   async saveSessionLog(log: WorkoutSessionLog): Promise<void> {
     try {
-      const existing = await StorageService.getSessionLogs();
-      const updated = [log, ...existing];
+      const currentLogs = await this.getSessionLogs();
+      const updated = [log, ...currentLogs];
       await AsyncStorage.setItem(KEYS.SESSION_LOGS, JSON.stringify(updated));
     } catch (e) {
       console.error('Error saving session log:', e);
@@ -95,12 +99,11 @@ export const StorageService = {
   async getAchievements(): Promise<Achievement[]> {
     try {
       const data = await AsyncStorage.getItem(KEYS.ACHIEVEMENTS);
-      if (data) {
-        return JSON.parse(data);
+      if (!data) {
+        await this.saveAchievements(INITIAL_ACHIEVEMENTS);
+        return INITIAL_ACHIEVEMENTS;
       }
-      // Seed default achievements
-      await AsyncStorage.setItem(KEYS.ACHIEVEMENTS, JSON.stringify(INITIAL_ACHIEVEMENTS));
-      return INITIAL_ACHIEVEMENTS;
+      return JSON.parse(data);
     } catch (e) {
       console.error('Error loading achievements:', e);
       return INITIAL_ACHIEVEMENTS;
@@ -115,10 +118,16 @@ export const StorageService = {
     }
   },
 
-  // --- Custom Gemini API Key (if provided by user in Settings) ---
+  // --- Custom Gemini API Key (Encrypted via expo-secure-store) ---
   async getCustomApiKey(): Promise<string | null> {
     try {
-      return await AsyncStorage.getItem(KEYS.CUSTOM_API_KEY);
+      const isSecureAvailable = await SecureStore.isAvailableAsync();
+      if (isSecureAvailable) {
+        const secureKey = await SecureStore.getItemAsync(SECURE_KEYS.CUSTOM_API_KEY);
+        if (secureKey) return secureKey;
+      }
+      // Fallback for web or migration
+      return await AsyncStorage.getItem(SECURE_KEYS.CUSTOM_API_KEY);
     } catch {
       return null;
     }
@@ -126,25 +135,40 @@ export const StorageService = {
 
   async saveCustomApiKey(key: string): Promise<void> {
     try {
-      if (!key.trim()) {
-        await AsyncStorage.removeItem(KEYS.CUSTOM_API_KEY);
+      const trimmed = key.trim();
+      const isSecureAvailable = await SecureStore.isAvailableAsync();
+
+      if (!trimmed) {
+        if (isSecureAvailable) {
+          await SecureStore.deleteItemAsync(SECURE_KEYS.CUSTOM_API_KEY);
+        }
+        await AsyncStorage.removeItem(SECURE_KEYS.CUSTOM_API_KEY);
       } else {
-        await AsyncStorage.setItem(KEYS.CUSTOM_API_KEY, key.trim());
+        if (isSecureAvailable) {
+          await SecureStore.setItemAsync(SECURE_KEYS.CUSTOM_API_KEY, trimmed);
+        } else {
+          await AsyncStorage.setItem(SECURE_KEYS.CUSTOM_API_KEY, trimmed);
+        }
       }
     } catch (e) {
-      console.error('Error saving custom API key:', e);
+      console.error('Error saving secure custom API key:', e);
     }
   },
 
   // --- Reset All Data ---
   async resetAllData(): Promise<void> {
     try {
+      const isSecureAvailable = await SecureStore.isAvailableAsync();
+      if (isSecureAvailable) {
+        await SecureStore.deleteItemAsync(SECURE_KEYS.CUSTOM_API_KEY);
+      }
       await Promise.all([
         AsyncStorage.removeItem(KEYS.WORKOUT_PLAN),
         AsyncStorage.removeItem(KEYS.SESSION_LOGS),
         AsyncStorage.removeItem(KEYS.USER_STATS),
         AsyncStorage.removeItem(KEYS.ACHIEVEMENTS),
         AsyncStorage.removeItem(KEYS.LAST_ACTIVE_DAY),
+        AsyncStorage.removeItem(SECURE_KEYS.CUSTOM_API_KEY),
       ]);
     } catch (e) {
       console.error('Error resetting all data:', e);
