@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AchievementsGrid } from '../../src/components/profile/AchievementsGrid';
 import { GeminiConfigCard } from '../../src/components/profile/GeminiConfigCard';
 import { LifetimeStatsRow } from '../../src/components/profile/LifetimeStatsRow';
@@ -9,6 +9,7 @@ import { Colors, Spacing, Typography } from '../../src/constants/theme';
 import { useProfileData } from '../../src/hooks/useProfileData';
 
 export default function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const {
     stats,
     achievements,
@@ -22,7 +23,7 @@ export default function ProfileScreen() {
   } = useProfileData();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Profile Avatar & Level Header */}
         <ProfileHeroCard stats={stats} />
@@ -50,7 +51,7 @@ export default function ProfileScreen() {
           <Text style={styles.resetBtnText}>Zerar Todos os Dados e Histórico</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -62,6 +63,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: Spacing.base,
     paddingBottom: 40,
+    paddingTop: Spacing.sm,
   },
   resetBtn: {
     flexDirection: 'row',

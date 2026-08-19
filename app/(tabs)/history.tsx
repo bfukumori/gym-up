@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MonthlyReportView } from '../../src/components/history/MonthlyReportView';
 import { WeeklyReportView } from '../../src/components/history/WeeklyReportView';
 import { WorkoutLogList } from '../../src/components/history/WorkoutLogList';
@@ -8,10 +8,11 @@ import { BorderRadius, Colors, Spacing, Typography } from '../../src/constants/t
 import { useHistoryData } from '../../src/hooks/useHistoryData';
 
 export default function HistoryScreen() {
+  const insets = useSafeAreaInsets();
   const { viewMode, setViewMode, logs, weeklyStats, monthlyStats } = useHistoryData();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Screen Title */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Relatórios & Progresso</Text>
@@ -62,7 +63,7 @@ export default function HistoryScreen() {
         {viewMode === 'monthly' && <MonthlyReportView {...monthlyStats} />}
         {viewMode === 'logs' && <WorkoutLogList logs={logs} />}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -73,7 +74,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },

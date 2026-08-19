@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AvailabilityStep } from '../../src/components/quiz/AvailabilityStep';
 import { ExperienceStep } from '../../src/components/quiz/ExperienceStep';
 import { FocusStep } from '../../src/components/quiz/FocusStep';
@@ -16,6 +17,7 @@ import { Colors, Spacing, Typography } from '../../src/constants/theme';
 import { useQuizForm } from '../../src/hooks/useQuizForm';
 
 export default function QuizScreen() {
+  const insets = useSafeAreaInsets();
   const {
     step,
     loading,
@@ -78,7 +80,12 @@ export default function QuizScreen() {
       </ScrollView>
 
       {/* Footer Navigation */}
-      <View style={styles.footer}>
+      <View
+        style={[
+          styles.footer,
+          { paddingBottom: insets.bottom > 0 ? insets.bottom + 8 : Spacing.base },
+        ]}
+      >
         <TouchableOpacity style={styles.backBtn} onPress={handleBack} disabled={loading}>
           <Text style={styles.backBtnText}>{step === 1 ? 'Cancelar' : 'Voltar'}</Text>
         </TouchableOpacity>
@@ -113,7 +120,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.base,
-    paddingBottom: 100,
+    paddingBottom: 110,
   },
   footer: {
     position: 'absolute',
@@ -123,7 +130,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
-    padding: Spacing.base,
+    paddingHorizontal: Spacing.base,
+    paddingTop: Spacing.base,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,

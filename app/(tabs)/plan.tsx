@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DayOverviewCard } from '../../src/components/plan/DayOverviewCard';
 import { DaySelectorTabs } from '../../src/components/plan/DaySelectorTabs';
 import { PlanExerciseItem } from '../../src/components/plan/PlanExerciseItem';
@@ -11,11 +11,12 @@ import { usePlanData } from '../../src/hooks/usePlanData';
 
 export default function PlanScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { plan, selectedDayIdx, setSelectedDayIdx, activeDay, handleResetPlan } = usePlanData();
 
   if (!plan?.days || plan.days.length === 0) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconBox}>
             <Ionicons name="barbell-outline" size={40} color={Colors.primary} />
@@ -33,23 +34,23 @@ export default function PlanScreen() {
             <Text style={styles.createBtnText}>Montar Treino com IA</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text style={styles.headerTitle}>{plan.title}</Text>
-          <Text style={styles.headerSubtitle} numberOfLines={1}>
+          <Text style={styles.headerSubtitle} numberOfLines={2}>
             {plan.description}
           </Text>
         </View>
 
         <TouchableOpacity style={styles.recreateBtn} onPress={handleResetPlan}>
-          <Ionicons name="refresh" size={18} color={Colors.primary} />
+          <Ionicons name="refresh" size={16} color={Colors.primary} />
           <Text style={styles.recreateBtnText}>Nova IA</Text>
         </TouchableOpacity>
       </View>
@@ -91,7 +92,7 @@ export default function PlanScreen() {
           </>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -102,26 +103,29 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+    gap: Spacing.sm,
   },
   headerLeft: {
     flex: 1,
-    paddingRight: Spacing.sm,
   },
   headerTitle: {
     color: Colors.textPrimary,
-    fontSize: Typography.fontSizes.lg,
+    fontSize: Typography.fontSizes.md,
     fontWeight: '800',
+    lineHeight: 22,
   },
   headerSubtitle: {
     color: Colors.textMuted,
     fontSize: Typography.fontSizes.xs,
-    marginTop: 2,
+    marginTop: 4,
+    lineHeight: 16,
   },
   recreateBtn: {
     flexDirection: 'row',
@@ -131,6 +135,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs + 2,
     borderRadius: BorderRadius.md,
     gap: 4,
+    alignSelf: 'flex-start',
   },
   recreateBtnText: {
     color: Colors.primary,

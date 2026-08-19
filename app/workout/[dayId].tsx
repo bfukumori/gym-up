@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CelebrationModal } from '../../src/components/CelebrationModal';
 import { ExerciseCard } from '../../src/components/ExerciseCard';
 import { RestTimerModal } from '../../src/components/RestTimerModal';
@@ -19,6 +19,7 @@ import { useWorkoutSession } from '../../src/hooks/useWorkoutSession';
 export default function ActiveWorkoutScreen() {
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const {
     loading,
@@ -53,7 +54,7 @@ export default function ActiveWorkoutScreen() {
   const { completed, total, percent } = calculateWorkoutProgress();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       {/* Top Header Bar */}
       <WorkoutTopBar
         dayName={day.name}
@@ -112,7 +113,7 @@ export default function ActiveWorkoutScreen() {
           router.replace('/(tabs)');
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

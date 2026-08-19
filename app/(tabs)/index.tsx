@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyPlanCard } from '../../src/components/home/EmptyPlanCard';
 import { QuickStatsGrid } from '../../src/components/home/QuickStatsGrid';
 import { TodayWorkoutCard } from '../../src/components/home/TodayWorkoutCard';
@@ -12,6 +12,7 @@ import { useHomeData } from '../../src/hooks/useHomeData';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const {
     stats,
     plan,
@@ -26,7 +27,7 @@ export default function HomeScreen() {
   } = useHomeData();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -80,7 +81,7 @@ export default function HomeScreen() {
         {/* Quick Stats Grid */}
         <QuickStatsGrid stats={stats} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -98,6 +99,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: Spacing.md,
+    marginTop: Spacing.xs,
   },
   appTitle: {
     color: Colors.textPrimary,
