@@ -55,7 +55,7 @@ export function WorkoutLogList({ logs }: WorkoutLogListProps) {
               <View style={styles.logDetailItem}>
                 <Ionicons name="barbell-outline" size={14} color={Colors.textMuted} />
                 <Text style={styles.logDetailText}>
-                  {(log.totalVolumeKg / 1000).toFixed(1)}k kg
+                  {Math.round(log.totalVolumeKg).toLocaleString('pt-BR')} kg
                 </Text>
               </View>
             </View>

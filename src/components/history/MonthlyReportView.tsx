@@ -17,6 +17,8 @@ export function MonthlyReportView({
   volume,
   xp,
 }: MonthlyReportViewProps) {
+  const formattedVolume = Math.round(volume).toLocaleString('pt-BR');
+
   return (
     <View>
       <View style={styles.summaryCard}>
@@ -48,12 +50,10 @@ export function MonthlyReportView({
       </View>
 
       <View style={styles.summaryCard}>
-        <Text style={styles.cardTitle}>Toneladas Movimentadas</Text>
-        <Text style={styles.tonnageValue}>
-          {volume >= 1000 ? `${(volume / 1000).toFixed(1)} Toneladas` : `${volume} kg`}
-        </Text>
+        <Text style={styles.cardTitle}>Volume Total Movimentado</Text>
+        <Text style={styles.volumeValue}>{formattedVolume} kg</Text>
         <Text style={styles.adherenceSubtitle}>
-          Soma de todas as repetições multiplicadas pelo peso em cada série neste mês.
+          Soma do volume acumulado de todas as séries no mês (Séries × Reps × Peso).
         </Text>
       </View>
 
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 2,
   },
-  tonnageValue: {
+  volumeValue: {
     color: Colors.accentBlue,
     fontSize: Typography.fontSizes.xxl,
     fontWeight: '900',

@@ -19,7 +19,7 @@ export function LifetimeStatsRow({ stats }: LifetimeStatsRowProps) {
       </View>
       <View style={styles.statMiniCard}>
         <Text style={styles.statNumber}>{(stats.totalVolumeKg / 1000).toFixed(1)}k</Text>
-        <Text style={styles.statLabel}>Kg Tonnage</Text>
+        <Text style={styles.statLabel}>Volume (kg)</Text>
       </View>
       <View style={styles.statMiniCard}>
         <Text style={styles.statNumber}>{stats.longestStreakDays}d</Text>

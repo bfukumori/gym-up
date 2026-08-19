@@ -49,8 +49,10 @@ export function WeeklyReportView({
 
         <View style={styles.metricCard}>
           <Ionicons name="barbell" size={22} color={Colors.accentBlue} />
-          <Text style={styles.metricValue}>{(volume / 1000).toFixed(1)}k</Text>
-          <Text style={styles.metricLabel}>Kg Levantados</Text>
+          <Text style={styles.metricValue}>
+            {volume >= 1000 ? `${(volume / 1000).toFixed(1)}k` : `${Math.round(volume)}`}
+          </Text>
+          <Text style={styles.metricLabel}>Volume (kg)</Text>
         </View>
 
         <View style={styles.metricCard}>

@@ -43,7 +43,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'volume_10k',
-    title: 'Toneladas Movidas',
+    title: '10.000 kg Movidos',
     description: 'Movimentou mais de 10.000 kg somando todas as séries.',
     icon: 'trending-up',
     xpReward: 350,
