@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,223 +10,36 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CelebrationModal } from '../../src/components/CelebrationModal';
-import { ExerciseCard, type SetState } from '../../src/components/ExerciseCard';
+import { ExerciseCard } from '../../src/components/ExerciseCard';
 import { RestTimerModal } from '../../src/components/RestTimerModal';
+import { WorkoutTopBar } from '../../src/components/workout/WorkoutTopBar';
 import { BorderRadius, Colors, Spacing, Typography } from '../../src/constants/theme';
-import { GamificationService } from '../../src/services/gamification';
-import { StorageService } from '../../src/services/storage';
-import type { Achievement, WorkoutDay, WorkoutPlan, WorkoutSessionLog } from '../../src/types';
+import { useWorkoutSession } from '../../src/hooks/useWorkoutSession';
 
 export default function ActiveWorkoutScreen() {
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
-  const [plan, setPlan] = useState<WorkoutPlan | null>(null);
-  const [day, setDay] = useState<WorkoutDay | null>(null);
-
-  // Exercise & Set States: map from exerciseId -> SetState[]
-  const [exerciseSets, setExerciseSets] = useState<Record<string, SetState[]>>({});
-
-  // Timer State
-  const [startTime] = useState<Date>(new Date());
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-
-  // Rest Timer Modal
-  const [restTimerVisible, setRestTimerVisible] = useState(false);
-  const [restTimerSeconds, setRestTimerSeconds] = useState(60);
-
-  // Celebration Modal
-  const [celebrationVisible, setCelebrationVisible] = useState(false);
-  const [xpEarned, setXpEarned] = useState(0);
-  const [newLevel, setNewLevel] = useState<number | undefined>(undefined);
-  const [leveledUp, setLeveledUp] = useState(false);
-  const [unlockedBadges, setUnlockedBadges] = useState<Achievement[]>([]);
-
-  const loadWorkoutData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const savedPlan = await StorageService.getWorkoutPlan();
-      if (!savedPlan) {
-        Alert.alert('Nenhum plano encontrado', 'Crie seu plano de treino primeiro.');
-        router.replace('/(tabs)');
-        return;
-      }
-      setPlan(savedPlan);
-
-      const targetDay = savedPlan.days.find((d) => d.id === dayId) || savedPlan.days[0];
-      setDay(targetDay);
-
-      // Initialize set states
-      const initialMap: Record<string, SetState[]> = {};
-      targetDay.exercises.forEach((ex) => {
-        initialMap[ex.id] = ex.targetSets.map((ts, idx) => ({
-          setNumber: ts.setNumber || idx + 1,
-          reps: (ts.targetReps || '10').replace(/[^0-9]/g, '').slice(0, 2) || '10',
-          weightKg: ts.suggestedWeightKg ? String(ts.suggestedWeightKg) : '15',
-          isCompleted: false,
-        }));
-      });
-      setExerciseSets(initialMap);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }, [dayId, router]);
-
-  useEffect(() => {
-    loadWorkoutData();
-  }, [loadWorkoutData]);
-
-  // Elapsed timer clock
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedSeconds((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleToggleSet = (exerciseId: string, setIndex: number, restSeconds: number) => {
-    setExerciseSets((prev) => {
-      const currentSets = [...(prev[exerciseId] || [])];
-      const currentState = currentSets[setIndex];
-      const willBeCompleted = !currentState.isCompleted;
-
-      currentSets[setIndex] = {
-        ...currentState,
-        isCompleted: willBeCompleted,
-      };
-
-      if (willBeCompleted) {
-        setRestTimerSeconds(restSeconds);
-        setRestTimerVisible(true);
-      }
-
-      return {
-        ...prev,
-        [exerciseId]: currentSets,
-      };
-    });
-  };
-
-  const handleChangeWeight = (exerciseId: string, setIndex: number, weight: string) => {
-    setExerciseSets((prev) => {
-      const currentSets = [...(prev[exerciseId] || [])];
-      currentSets[setIndex] = { ...currentSets[setIndex], weightKg: weight };
-      return { ...prev, [exerciseId]: currentSets };
-    });
-  };
-
-  const handleChangeReps = (exerciseId: string, setIndex: number, reps: string) => {
-    setExerciseSets((prev) => {
-      const currentSets = [...(prev[exerciseId] || [])];
-      currentSets[setIndex] = { ...currentSets[setIndex], reps: reps };
-      return { ...prev, [exerciseId]: currentSets };
-    });
-  };
-
-  const calculateWorkoutProgress = () => {
-    let total = 0;
-    let completed = 0;
-    Object.values(exerciseSets).forEach((sets) => {
-      total += sets.length;
-      completed += sets.filter((s) => s.isCompleted).length;
-    });
-    return { completed, total, percent: total > 0 ? (completed / total) * 100 : 0 };
-  };
-
-  const handleFinishWorkout = async () => {
-    const { completed, total } = calculateWorkoutProgress();
-
-    if (completed === 0) {
-      Alert.alert(
-        'Nenhuma série concluída',
-        'Marque pelo menos uma série antes de finalizar o treino.'
-      );
-      return;
-    }
-
-    Alert.alert(
-      'Finalizar Treino',
-      `Você concluiu ${completed} de ${total} séries. Deseja registrar e resgatar seu XP?`,
-      [
-        { text: 'Continuar Treinando', style: 'cancel' },
-        {
-          text: 'Finalizar!',
-          style: 'default',
-          onPress: async () => {
-            await submitWorkout();
-          },
-        },
-      ]
-    );
-  };
-
-  const submitWorkout = async () => {
-    if (!day || !plan) return;
-
-    try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-      let totalVolume = 0;
-      let totalCompletedSets = 0;
-      const completedExercisesLog = day.exercises.map((ex) => {
-        const sets = exerciseSets[ex.id] || [];
-        const completedSets = sets
-          .filter((s) => s.isCompleted)
-          .map((s) => {
-            const repsNum = parseInt(s.reps, 10) || 0;
-            const weightNum = parseFloat(s.weightKg) || 0;
-            totalVolume += repsNum * weightNum;
-            totalCompletedSets += 1;
-            return {
-              setNumber: s.setNumber,
-              reps: repsNum,
-              weightKg: weightNum,
-              completedAt: new Date().toISOString(),
-            };
-          });
-
-        return {
-          exerciseId: ex.id,
-          exerciseName: ex.name,
-          muscleGroup: ex.muscleGroup,
-          sets: completedSets,
-        };
-      });
-
-      const userStats = await StorageService.getUserStats();
-      const isStreakActive = userStats.currentStreakDays > 0;
-      const earnedXp = GamificationService.calculateWorkoutXp(totalCompletedSets, isStreakActive);
-
-      const sessionLog: WorkoutSessionLog = {
-        id: `session-${Date.now()}`,
-        planId: plan.id,
-        dayId: day.id,
-        dayName: day.name,
-        startedAt: startTime.toISOString(),
-        completedAt: new Date().toISOString(),
-        durationMinutes: Math.max(1, Math.round(elapsedSeconds / 60)),
-        totalSetsCompleted: totalCompletedSets,
-        totalVolumeKg: totalVolume,
-        xpEarned: earnedXp,
-        exercises: completedExercisesLog,
-      };
-
-      await StorageService.saveSessionLog(sessionLog);
-      const result = await GamificationService.processCompletedWorkout(sessionLog);
-
-      setXpEarned(earnedXp);
-      setLeveledUp(result.leveledUp);
-      setNewLevel(result.newLevel);
-      setUnlockedBadges(result.newlyUnlockedAchievements);
-      setCelebrationVisible(true);
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Erro', 'Não foi possível registrar a sessão.');
-    }
-  };
+  const {
+    loading,
+    day,
+    exerciseSets,
+    handleToggleSet,
+    handleChangeWeight,
+    handleChangeReps,
+    calculateWorkoutProgress,
+    handleFinishWorkout,
+    timerFormatted,
+    restTimerVisible,
+    setRestTimerVisible,
+    restTimerSeconds,
+    celebrationVisible,
+    setCelebrationVisible,
+    xpEarned,
+    leveledUp,
+    newLevel,
+    unlockedBadges,
+  } = useWorkoutSession(dayId);
 
   if (loading || !day) {
     return (
@@ -241,40 +51,16 @@ export default function ActiveWorkoutScreen() {
   }
 
   const { completed, total, percent } = calculateWorkoutProgress();
-  const minutes = Math.floor(elapsedSeconds / 60);
-  const seconds = elapsedSeconds % 60;
-  const timerStr = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Top Header Bar */}
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => {
-            Alert.alert('Sair do Treino', 'Deseja realmente pausar/abandonar este treino?', [
-              { text: 'Ficar no Treino', style: 'cancel' },
-              { text: 'Sair', style: 'destructive', onPress: () => router.back() },
-            ]);
-          }}
-          style={styles.backButton}
-        >
-          <Ionicons name="close" size={24} color={Colors.textPrimary} />
-        </TouchableOpacity>
-
-        <View style={styles.topCenter}>
-          <Text style={styles.topDayTitle} numberOfLines={1}>
-            {day.name}
-          </Text>
-          <View style={styles.timeBadge}>
-            <Ionicons name="stopwatch-outline" size={14} color={Colors.accentOrange} />
-            <Text style={styles.timeText}>{timerStr}</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity style={styles.finishTopBtn} onPress={handleFinishWorkout}>
-          <Text style={styles.finishTopBtnText}>Concluir</Text>
-        </TouchableOpacity>
-      </View>
+      <WorkoutTopBar
+        dayName={day.name}
+        timerFormatted={timerFormatted}
+        onClose={() => router.back()}
+        onFinish={handleFinishWorkout}
+      />
 
       {/* Progress Bar */}
       <View style={styles.workoutProgressBarContainer}>
@@ -345,51 +131,6 @@ const styles = StyleSheet.create({
   loadingText: {
     color: Colors.textSecondary,
     fontSize: Typography.fontSizes.base,
-  },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.sm,
-    backgroundColor: Colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  backButton: {
-    padding: 6,
-  },
-  topCenter: {
-    alignItems: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.sm,
-  },
-  topDayTitle: {
-    color: Colors.textPrimary,
-    fontSize: Typography.fontSizes.sm,
-    fontWeight: '700',
-  },
-  timeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 2,
-  },
-  timeText: {
-    color: Colors.accentOrange,
-    fontSize: Typography.fontSizes.xs,
-    fontWeight: '700',
-  },
-  finishTopBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs + 2,
-    borderRadius: BorderRadius.md,
-  },
-  finishTopBtnText: {
-    color: '#000000',
-    fontSize: Typography.fontSizes.xs,
-    fontWeight: '800',
   },
   workoutProgressBarContainer: {
     height: 4,
