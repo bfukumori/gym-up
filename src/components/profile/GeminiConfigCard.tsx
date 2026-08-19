@@ -15,21 +15,29 @@ export function GeminiConfigCard({
   isSavedKey,
   onSaveKey,
 }: GeminiConfigCardProps) {
+  const hasKey = customKey.trim().length > 0;
+
   return (
     <View style={styles.configCard}>
       <View style={styles.configHeader}>
-        <Ionicons name="key-outline" size={20} color={Colors.primary} />
-        <Text style={styles.configTitle}>Configuração do Gemini IA</Text>
+        <Ionicons name="sparkles" size={20} color={Colors.primary} />
+        <Text style={styles.configTitle}>Inteligência Artificial (Gemini)</Text>
       </View>
 
       <Text style={styles.configDesc}>
-        A chave do Google AI Studio pode vir do arquivo <Text style={styles.codeText}>.env</Text>{' '}
-        (chave padrão) ou ser sobrescrita abaixo:
+        Conecte sua chave gratuita do Google AI Studio para gerar fichas ilimitadas e 100%
+        personalizadas com IA.
+      </Text>
+
+      <Text style={styles.configSubDesc}>
+        {hasKey
+          ? 'Sua chave personalizada está configurada e ativa para criar seus treinos.'
+          : 'Se preferir não usar uma chave, o Gym-Up montará sua rotina automaticamente com nosso treino padrão inteligente.'}
       </Text>
 
       <TextInput
         style={styles.keyInput}
-        placeholder="AIzaSy... (Chave API do Gemini)"
+        placeholder="Cole sua chave API aqui (opcional)"
         placeholderTextColor={Colors.textDisabled}
         value={customKey}
         onChangeText={onChangeKey}
@@ -37,16 +45,24 @@ export function GeminiConfigCard({
         autoCapitalize="none"
       />
 
-      <TouchableOpacity style={styles.saveKeyBtn} onPress={onSaveKey}>
-        <Text style={styles.saveKeyBtnText}>
-          {isSavedKey ? 'Chave Atualizada ✓' : 'Salvar Chave no App'}
+      <TouchableOpacity
+        style={[styles.saveKeyBtn, !hasKey && styles.saveKeyBtnMuted]}
+        onPress={onSaveKey}
+      >
+        <Text style={[styles.saveKeyBtnText, !hasKey && styles.saveKeyBtnTextMuted]}>
+          {isSavedKey
+            ? 'Chave Salva com Sucesso ✓'
+            : hasKey
+              ? 'Salvar Chave API'
+              : 'Salvar Alterações'}
         </Text>
       </TouchableOpacity>
 
       <View style={styles.freeKeyHint}>
         <Ionicons name="information-circle-outline" size={16} color={Colors.accentBlue} />
         <Text style={styles.freeKeyHintText}>
-          O Gemini 2.5 Flash é 100% gratuito no Google AI Studio (aistudio.google.com).
+          Você pode gerar uma chave gratuita a qualquer momento em{' '}
+          <Text style={styles.linkText}>aistudio.google.com</Text>
         </Text>
       </View>
     </View>
@@ -77,11 +93,13 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontSize: Typography.fontSizes.xs,
     lineHeight: 18,
-    marginBottom: Spacing.sm,
+    marginBottom: 4,
   },
-  codeText: {
-    color: Colors.primary,
-    fontWeight: '700',
+  configSubDesc: {
+    color: Colors.textMuted,
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: Spacing.sm,
   },
   keyInput: {
     backgroundColor: Colors.surface,
@@ -99,10 +117,18 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm + 2,
     alignItems: 'center',
   },
+  saveKeyBtnMuted: {
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
   saveKeyBtnText: {
     color: '#000000',
     fontSize: Typography.fontSizes.sm,
     fontWeight: '700',
+  },
+  saveKeyBtnTextMuted: {
+    color: Colors.textSecondary,
   },
   freeKeyHint: {
     flexDirection: 'row',
@@ -114,5 +140,10 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     fontSize: 11,
     flex: 1,
+    lineHeight: 15,
+  },
+  linkText: {
+    color: Colors.accentBlue,
+    fontWeight: '600',
   },
 });

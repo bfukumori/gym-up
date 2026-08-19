@@ -147,8 +147,9 @@ export const GeminiService = {
     const apiKey = await getActiveApiKey();
 
     if (!apiKey) {
-      console.warn('No Gemini API key found, generating intelligent offline template.');
-      return generateOfflineWorkoutPlan(answers);
+      const fallback = generateOfflineWorkoutPlan(answers);
+      await StorageService.saveWorkoutPlan(fallback);
+      return fallback;
     }
 
     try {

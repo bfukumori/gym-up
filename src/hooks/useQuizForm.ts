@@ -45,7 +45,7 @@ export function useQuizForm() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
         'Treino Gerado com Sucesso! 🚀',
-        'Seu novo plano de treino personalizado foi montado pela IA do Gemini.',
+        'Seu novo plano de treino personalizado foi montado e já está pronto para execução.',
         [
           {
             text: 'Visualizar Ficha',
