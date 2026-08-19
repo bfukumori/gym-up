@@ -24,6 +24,12 @@
     "production": {
       "autoIncrement": true,
       "channel": "production"
+    },
+    "development-ios-simulator": {
+      "developmentClient": true,
+      "ios": {
+        "simulator": true
+      }
     }
   },
   "submit": {

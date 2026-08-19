@@ -1,8 +1,11 @@
+# Create preview builds
+#
+# Builds Android and iOS preview builds for devices and simulators.
+# Learn more: https://docs.expo.dev/develop/preview-builds/introduction/
+#
+# Created by EAS CLI v22.0.0
+
 name: Create preview builds
-
-on:
-  workflow_dispatch:
-
 jobs:
   android_preview_build:
     name: Build Android
@@ -10,7 +13,6 @@ jobs:
     params:
       platform: android
       profile: preview
-
   ios_device_preview_build:
     name: Build iOS device
     type: build
