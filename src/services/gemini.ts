@@ -1,8 +1,12 @@
 import type { QuizAnswers, WorkoutDay, WorkoutPlan } from '../types';
 import { StorageService } from './storage';
 
-const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const CANDIDATE_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-2.5-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-latest',
+];
 
 export async function getActiveApiKey(): Promise<string> {
   const customKey = await StorageService.getCustomApiKey();
@@ -96,19 +100,13 @@ Garanta que o número de dias em "days" seja EXATAMENTE ${answers.daysPerWeek}.
 Os nomes dos exercícios devem estar em Português do Brasil comumente usados nas academias.`;
 }
 
-export const GeminiService = {
-  async generateWorkoutPlan(answers: QuizAnswers): Promise<WorkoutPlan> {
-    const apiKey = await getActiveApiKey();
+async function callGeminiApi(prompt: string, apiKey: string): Promise<string> {
+  let lastError = '';
 
-    if (!apiKey) {
-      console.warn('No Gemini API key found, generating intelligent offline template.');
-      return generateOfflineWorkoutPlan(answers);
-    }
-
+  for (const model of CANDIDATE_MODELS) {
     try {
-      const prompt = generatePromptForWorkout(answers);
-
-      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,14 +124,36 @@ export const GeminiService = {
         }),
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        const data = await response.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) return text;
+      } else {
         const errText = await response.text();
-        console.error('Gemini API request failed:', response.status, errText);
-        throw new Error(`Erro na API do Gemini (${response.status}): ${errText}`);
+        lastError = `Modelo ${model} retornou ${response.status}: ${errText}`;
+        console.warn(`Tentativa com ${model} falhou:`, lastError);
       }
+    } catch (e) {
+      lastError = String(e);
+      console.warn(`Erro de conexão com ${model}:`, e);
+    }
+  }
 
-      const data = await response.json();
-      const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  throw new Error(`Todas as tentativas de modelo Gemini falharam. Último erro: ${lastError}`);
+}
+
+export const GeminiService = {
+  async generateWorkoutPlan(answers: QuizAnswers): Promise<WorkoutPlan> {
+    const apiKey = await getActiveApiKey();
+
+    if (!apiKey) {
+      console.warn('No Gemini API key found, generating intelligent offline template.');
+      return generateOfflineWorkoutPlan(answers);
+    }
+
+    try {
+      const prompt = generatePromptForWorkout(answers);
+      const responseText = await callGeminiApi(prompt, apiKey);
 
       if (!responseText) {
         throw new Error('Resposta vazia recebida do Gemini.');
