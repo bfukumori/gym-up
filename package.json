@@ -1,6 +1,9 @@
 {
   "name": "gym-up",
   "version": "1.0.0",
+  "description": "Aplicativo mobile pessoal e gamificado para gerenciamento de treinos na academia integrado ao Google Gemini.",
+  "author": "Bruno Fukumori <brunofukumori@gmail.com>",
+  "license": "MIT",
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
