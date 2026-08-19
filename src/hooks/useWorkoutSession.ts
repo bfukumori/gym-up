@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import type { SetState } from '../components/ExerciseCard';
 import { GamificationService } from '../services/gamification';
+import { NotificationService } from '../services/notifications';
 import { StorageService } from '../services/storage';
 import type { Achievement, WorkoutDay, WorkoutPlan, WorkoutSessionLog } from '../types';
 
@@ -177,6 +178,7 @@ export function useWorkoutSession(dayId: string | undefined) {
 
       await StorageService.saveSessionLog(sessionLog);
       const result = await GamificationService.processCompletedWorkout(sessionLog);
+      await NotificationService.onWorkoutCompleted();
 
       setXpEarned(earnedXp);
       setLeveledUp(result.leveledUp);

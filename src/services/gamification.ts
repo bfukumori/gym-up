@@ -1,4 +1,5 @@
 import type { Achievement, UserStats, WorkoutSessionLog } from '../types';
+import { getLocalDateString } from './notifications';
 import { StorageService } from './storage';
 
 export const XP_CONFIG = {
@@ -42,7 +43,7 @@ export const GamificationService = {
     const currentStats = await StorageService.getUserStats();
     const achievements = await StorageService.getAchievements();
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getLocalDateString();
     let newStreak = currentStats.currentStreakDays;
 
     if (!currentStats.lastWorkoutDate) {

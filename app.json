@@ -23,6 +23,14 @@
           "resizeMode": "contain",
           "backgroundColor": "#0B0E14"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#6366F1",
+          "defaultChannel": "workout-reminders"
+        }
       ]
     ],
     "ios": {

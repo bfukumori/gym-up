@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AchievementsGrid } from '../../src/components/profile/AchievementsGrid';
 import { GeminiConfigCard } from '../../src/components/profile/GeminiConfigCard';
 import { LifetimeStatsRow } from '../../src/components/profile/LifetimeStatsRow';
+import { NotificationsCard } from '../../src/components/profile/NotificationsCard';
 import { ProfileHeroCard } from '../../src/components/profile/ProfileHeroCard';
 import { Colors, Spacing, Typography } from '../../src/constants/theme';
 import { useProfileData } from '../../src/hooks/useProfileData';
@@ -18,7 +19,9 @@ export default function ProfileScreen() {
     setCustomKey,
     isSavedKey,
     setIsSavedKey,
+    hasNotificationsPermission,
     handleSaveApiKey,
+    handleEnableOrTestNotifications,
     handleResetAllData,
   } = useProfileData();
 
@@ -33,6 +36,12 @@ export default function ProfileScreen() {
 
         {/* Gamification: Badges Grid */}
         <AchievementsGrid achievements={achievements} unlockedCount={unlockedCount} />
+
+        {/* Local Notifications Configuration */}
+        <NotificationsCard
+          hasPermission={hasNotificationsPermission}
+          onEnableOrTest={handleEnableOrTestNotifications}
+        />
 
         {/* Gemini API Key Configuration Section */}
         <GeminiConfigCard

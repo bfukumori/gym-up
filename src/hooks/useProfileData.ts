@@ -2,6 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
+import { NotificationService } from '../services/notifications';
 import { StorageService } from '../services/storage';
 import type { Achievement, UserStats } from '../types';
 
@@ -23,15 +24,18 @@ export function useProfileData() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [customKey, setCustomKey] = useState('');
   const [isSavedKey, setIsSavedKey] = useState(false);
+  const [hasNotificationsPermission, setHasNotificationsPermission] = useState(false);
 
   const loadProfileData = useCallback(async () => {
-    const [userStats, userAchievements, key] = await Promise.all([
+    const [userStats, userAchievements, key, notificationsAllowed] = await Promise.all([
       StorageService.getUserStats(),
       StorageService.getAchievements(),
       StorageService.getCustomApiKey(),
+      NotificationService.hasPermissions(),
     ]);
     setStats(userStats);
     setAchievements(userAchievements);
+    setHasNotificationsPermission(notificationsAllowed);
     if (key) {
       setCustomKey(key);
       setIsSavedKey(true);
@@ -51,6 +55,26 @@ export function useProfileData() {
     Alert.alert('Chave Salva!', 'Sua chave do Google Gemini foi salva com sucesso no aparelho.');
   };
 
+  const handleEnableOrTestNotifications = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const permitted = await NotificationService.requestPermissions();
+    setHasNotificationsPermission(permitted);
+
+    if (permitted) {
+      await NotificationService.sendTestNotification();
+      await NotificationService.syncWorkoutReminders();
+      Alert.alert(
+        'Notificação de Teste Enviada! 🚀',
+        'Uma notificação de teste será exibida em instantes. Os lembretes diários (11:30) e condicional (18:00 se não treinou) estão ativos.'
+      );
+    } else {
+      Alert.alert(
+        'Permissão Necessária',
+        'Habilite as notificações nas configurações do seu aparelho para receber os lembretes de treino.'
+      );
+    }
+  };
+
   const handleResetAllData = () => {
     Alert.alert(
       'Zerar Dados',
@@ -62,6 +86,7 @@ export function useProfileData() {
           style: 'destructive',
           onPress: async () => {
             await StorageService.resetAllData();
+            await NotificationService.syncWorkoutReminders();
             await loadProfileData();
             Alert.alert('Sucesso', 'Todos os dados foram resetados.');
             router.replace('/(tabs)');
@@ -81,7 +106,9 @@ export function useProfileData() {
     setCustomKey,
     isSavedKey,
     setIsSavedKey,
+    hasNotificationsPermission,
     handleSaveApiKey,
+    handleEnableOrTestNotifications,
     handleResetAllData,
   };
 }
