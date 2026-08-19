@@ -127,6 +127,38 @@ pnpm start
 
 ---
 
+## ☁️ EAS CI/CD, Variáveis de Ambiente & Preview Workflows
+
+O Gym-Up está configurado para automação de builds com o **EAS (Expo Application Services)**:
+
+### 1. Configuração de Variáveis de Ambiente no EAS
+Para que suas variáveis (como `EXPO_PUBLIC_GEMINI_API_KEY`) sejam injetadas com segurança nos builds em nuvem:
+
+```bash
+# Definir variável de ambiente no EAS (escopo do projeto)
+npx eas-cli@latest env:create --scope project --name EXPO_PUBLIC_GEMINI_API_KEY --value "sua_chave_aqui"
+```
+*(Ou acerte pelo painel web do Expo em **expo.dev ➔ Seu Projeto ➔ Configuration ➔ Environment Variables**)*.
+
+### 2. Perfis de Build ([eas.json](eas.json))
+- **`preview`**:
+  - **Android**: Gera um arquivo **`.apk`** pronto para instalar diretamente no seu celular sem precisar de Play Store.
+  - **iOS**: Gera build de simulador para testes rápidos.
+- **`production`**: Build de produção com auto-incremento de versão.
+
+```bash
+# Gerar APK de preview para Android
+npx eas-cli@latest build --platform android --profile preview
+
+# Gerar build de preview para iOS
+npx eas-cli@latest build --platform ios --profile preview
+```
+
+### 3. Workflows Automáticos ([.eas/workflows/preview.yml](.eas/workflows/preview.yml))
+Ao abrir um Pull Request para a branch `main` ou disparar manualmente via `workflow_dispatch`, o EAS executa os builds de preview em paralelo na nuvem automaticamente.
+
+---
+
 ## 👤 Autor
 
 - **Bruno Fukumori** - [brunofukumori@gmail.com](mailto:brunofukumori@gmail.com)
@@ -136,3 +168,4 @@ pnpm start
 ## 📄 Licença
 
 Este projeto está sob a licença [MIT](LICENSE).
+
