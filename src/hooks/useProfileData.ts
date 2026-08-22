@@ -50,9 +50,19 @@ export function useProfileData() {
 
   const handleSaveApiKey = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    await StorageService.saveCustomApiKey(customKey);
+    const sanitized = customKey.trim().replace(/^["']|["']$/g, '');
+    setCustomKey(sanitized);
+    await StorageService.saveCustomApiKey(sanitized);
     setIsSavedKey(true);
     Alert.alert('Chave Salva!', 'Sua chave do Google Gemini foi salva com sucesso no aparelho.');
+  };
+
+  const handleRemoveApiKey = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    await StorageService.saveCustomApiKey('');
+    setCustomKey('');
+    setIsSavedKey(false);
+    Alert.alert('Chave Removida', 'Sua chave do Gemini foi removida. O app utilizará os treinos padrão.');
   };
 
   const handleEnableOrTestNotifications = async () => {
@@ -108,6 +118,7 @@ export function useProfileData() {
     setIsSavedKey,
     hasNotificationsPermission,
     handleSaveApiKey,
+    handleRemoveApiKey,
     handleEnableOrTestNotifications,
     handleResetAllData,
   };

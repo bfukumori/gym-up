@@ -29,6 +29,7 @@ export default function ProfileScreen() {
     setIsSavedKey,
     hasNotificationsPermission,
     handleSaveApiKey,
+    handleRemoveApiKey,
     handleEnableOrTestNotifications,
     handleResetAllData,
   } = useProfileData();
@@ -69,6 +70,7 @@ export default function ProfileScreen() {
             }}
             isSavedKey={isSavedKey}
             onSaveKey={handleSaveApiKey}
+            onRemoveKey={handleRemoveApiKey}
           />
 
           {/* Data Reset */}
