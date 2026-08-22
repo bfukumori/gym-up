@@ -1,12 +1,23 @@
+import { Observe, ObserveRoot, useObserve } from 'expo-observe';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors } from '../src/constants/theme';
 import { NotificationService } from '../src/services/notifications';
 
-export default function RootLayout() {
+Observe.configure({
+  integrations: { 'expo-router': true },
+});
+
+SplashScreen.preventAutoHideAsync();
+
+function RootLayout() {
+  const [isReady, setIsReady] = useState(false);
+  const { markInteractive } = useObserve();
+
   useEffect(() => {
     // Initial sync and request permissions on mount
     const initNotifications = async () => {
@@ -23,10 +34,23 @@ export default function RootLayout() {
       }
     });
 
+    setIsReady(true);
+
     return () => {
       subscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (isReady) {
+      SplashScreen.hide();
+      markInteractive();
+    }
+  }, [isReady, markInteractive]);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>
@@ -59,3 +83,5 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+export default ObserveRoot.wrap(RootLayout);
