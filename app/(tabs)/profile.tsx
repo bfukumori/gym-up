@@ -1,5 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AchievementsGrid } from '../../src/components/profile/AchievementsGrid';
 import { GeminiConfigCard } from '../../src/components/profile/GeminiConfigCard';
@@ -27,39 +35,49 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Profile Avatar & Level Header */}
-        <ProfileHeroCard stats={stats} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.keyboardContainer}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
+          {/* Profile Avatar & Level Header */}
+          <ProfileHeroCard stats={stats} />
 
-        {/* Lifetime Stats */}
-        <LifetimeStatsRow stats={stats} />
+          {/* Lifetime Stats */}
+          <LifetimeStatsRow stats={stats} />
 
-        {/* Gamification: Badges Grid */}
-        <AchievementsGrid achievements={achievements} unlockedCount={unlockedCount} />
+          {/* Gamification: Badges Grid */}
+          <AchievementsGrid achievements={achievements} unlockedCount={unlockedCount} />
 
-        {/* Local Notifications Configuration */}
-        <NotificationsCard
-          hasPermission={hasNotificationsPermission}
-          onEnableOrTest={handleEnableOrTestNotifications}
-        />
+          {/* Local Notifications Configuration */}
+          <NotificationsCard
+            hasPermission={hasNotificationsPermission}
+            onEnableOrTest={handleEnableOrTestNotifications}
+          />
 
-        {/* Gemini API Key Configuration Section */}
-        <GeminiConfigCard
-          customKey={customKey}
-          onChangeKey={(v) => {
-            setCustomKey(v);
-            setIsSavedKey(false);
-          }}
-          isSavedKey={isSavedKey}
-          onSaveKey={handleSaveApiKey}
-        />
+          {/* Gemini API Key Configuration Section */}
+          <GeminiConfigCard
+            customKey={customKey}
+            onChangeKey={(v) => {
+              setCustomKey(v);
+              setIsSavedKey(false);
+            }}
+            isSavedKey={isSavedKey}
+            onSaveKey={handleSaveApiKey}
+          />
 
-        {/* Data Reset */}
-        <TouchableOpacity style={styles.resetBtn} onPress={handleResetAllData}>
-          <Ionicons name="trash-outline" size={18} color={Colors.danger} />
-          <Text style={styles.resetBtnText}>Zerar Todos os Dados e Histórico</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          {/* Data Reset */}
+          <TouchableOpacity style={styles.resetBtn} onPress={handleResetAllData}>
+            <Ionicons name="trash-outline" size={18} color={Colors.danger} />
+            <Text style={styles.resetBtnText}>Zerar Todos os Dados e Histórico</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -68,6 +86,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  keyboardContainer: {
+    flex: 1,
   },
   scrollContent: {
     padding: Spacing.base,

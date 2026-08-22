@@ -2,6 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -55,44 +57,54 @@ export default function ActiveWorkoutScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      {/* Top Header Bar */}
-      <WorkoutTopBar
-        dayName={day.name}
-        timerFormatted={timerFormatted}
-        onClose={() => router.back()}
-        onFinish={handleFinishWorkout}
-      />
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        {/* Top Header Bar */}
+        <WorkoutTopBar
+          dayName={day.name}
+          timerFormatted={timerFormatted}
+          onClose={() => router.back()}
+          onFinish={handleFinishWorkout}
+        />
 
-      {/* Progress Bar */}
-      <View style={styles.workoutProgressBarContainer}>
-        <View style={[styles.workoutProgressBarFill, { width: `${percent}%` }]} />
-      </View>
+        {/* Progress Bar */}
+        <View style={styles.workoutProgressBarContainer}>
+          <View style={[styles.workoutProgressBarFill, { width: `${percent}%` }]} />
+        </View>
 
-      <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
-        {/* Exercise Cards */}
-        {day.exercises.map((exercise) => (
-          <ExerciseCard
-            key={exercise.id}
-            exercise={exercise}
-            setStates={exerciseSets[exercise.id] || []}
-            onToggleSet={(idx, rest) => handleToggleSet(exercise.id, idx, rest)}
-            onChangeWeight={(idx, val) => handleChangeWeight(exercise.id, idx, val)}
-            onChangeReps={(idx, val) => handleChangeReps(exercise.id, idx, val)}
-          />
-        ))}
-
-        {/* Big Bottom Finish Button */}
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.bigFinishButton}
-          onPress={handleFinishWorkout}
+        <ScrollView
+          contentContainerStyle={styles.scrollList}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
-          <Ionicons name="checkmark-done-circle" size={26} color="#000000" />
-          <Text style={styles.bigFinishText}>
-            Finalizar Treino ({completed}/{total} Séries)
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
+          {/* Exercise Cards */}
+          {day.exercises.map((exercise) => (
+            <ExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              setStates={exerciseSets[exercise.id] || []}
+              onToggleSet={(idx, rest) => handleToggleSet(exercise.id, idx, rest)}
+              onChangeWeight={(idx, val) => handleChangeWeight(exercise.id, idx, val)}
+              onChangeReps={(idx, val) => handleChangeReps(exercise.id, idx, val)}
+            />
+          ))}
+
+          {/* Big Bottom Finish Button */}
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.bigFinishButton}
+            onPress={handleFinishWorkout}
+          >
+            <Ionicons name="checkmark-done-circle" size={26} color="#000000" />
+            <Text style={styles.bigFinishText}>
+              Finalizar Treino ({completed}/{total} Séries)
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Rest Timer Modal */}
       <RestTimerModal
@@ -121,6 +133,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  keyboardContainer: {
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,

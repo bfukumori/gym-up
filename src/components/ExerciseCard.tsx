@@ -97,24 +97,26 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({
             <View style={styles.colInput}>
               <TextInput
                 style={[styles.input, state.isCompleted && styles.inputCompleted]}
-                keyboardType="numeric"
+                keyboardType="decimal-pad"
                 value={state.weightKg}
                 onChangeText={(val) => onChangeWeight(index, val)}
                 placeholder="0"
                 placeholderTextColor={Colors.textDisabled}
                 editable={!state.isCompleted}
+                selectTextOnFocus
               />
             </View>
 
             <View style={styles.colInput}>
               <TextInput
                 style={[styles.input, state.isCompleted && styles.inputCompleted]}
-                keyboardType="numeric"
+                keyboardType="number-pad"
                 value={state.reps}
                 onChangeText={(val) => onChangeReps(index, val)}
                 placeholder="0"
                 placeholderTextColor={Colors.textDisabled}
                 editable={!state.isCompleted}
+                selectTextOnFocus
               />
             </View>
 

@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -43,72 +45,84 @@ export default function QuizScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Step Indicator Header */}
-      <StepIndicator step={step} totalSteps={4} />
-
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {step === 1 && <GoalStep selectedGoal={goal} onSelectGoal={setGoal} />}
-
-        {step === 2 && (
-          <AvailabilityStep
-            daysPerWeek={daysPerWeek}
-            onSelectDaysPerWeek={setDaysPerWeek}
-            minutesPerSession={minutesPerSession}
-            onSelectMinutesPerSession={setMinutesPerSession}
-          />
-        )}
-
-        {step === 3 && (
-          <ExperienceStep
-            experience={experience}
-            onSelectExperience={setExperience}
-            equipment={equipment}
-            onSelectEquipment={setEquipment}
-          />
-        )}
-
-        {step === 4 && (
-          <FocusStep
-            focusMuscles={focusMuscles}
-            onToggleMuscle={toggleMuscle}
-            limitations={limitations}
-            onChangeLimitations={setLimitations}
-            notes={notes}
-            onChangeNotes={setNotes}
-          />
-        )}
-      </ScrollView>
-
-      {/* Footer Navigation */}
-      <View
-        style={[
-          styles.footer,
-          { paddingBottom: insets.bottom > 0 ? insets.bottom + 8 : Spacing.base },
-        ]}
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
       >
-        <TouchableOpacity style={styles.backBtn} onPress={handleBack} disabled={loading}>
-          <Text style={styles.backBtnText}>{step === 1 ? 'Cancelar' : 'Voltar'}</Text>
-        </TouchableOpacity>
+        {/* Step Indicator Header */}
+        <StepIndicator step={step} totalSteps={4} />
 
-        <TouchableOpacity
-          style={[styles.primaryBtn, loading && styles.primaryBtnDisabled]}
-          onPress={handleNext}
-          disabled={loading}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
-          {loading ? (
-            <ActivityIndicator color="#000000" />
-          ) : (
-            <>
-              <Text style={styles.primaryBtnText}>{step === 4 ? 'Gerar com IA' : 'Próximo'}</Text>
-              <Ionicons
-                name={step === 4 ? 'sparkles' : 'arrow-forward'}
-                size={18}
-                color="#000000"
-              />
-            </>
+          {step === 1 && <GoalStep selectedGoal={goal} onSelectGoal={setGoal} />}
+
+          {step === 2 && (
+            <AvailabilityStep
+              daysPerWeek={daysPerWeek}
+              onSelectDaysPerWeek={setDaysPerWeek}
+              minutesPerSession={minutesPerSession}
+              onSelectMinutesPerSession={setMinutesPerSession}
+            />
           )}
-        </TouchableOpacity>
-      </View>
+
+          {step === 3 && (
+            <ExperienceStep
+              experience={experience}
+              onSelectExperience={setExperience}
+              equipment={equipment}
+              onSelectEquipment={setEquipment}
+            />
+          )}
+
+          {step === 4 && (
+            <FocusStep
+              focusMuscles={focusMuscles}
+              onToggleMuscle={toggleMuscle}
+              limitations={limitations}
+              onChangeLimitations={setLimitations}
+              notes={notes}
+              onChangeNotes={setNotes}
+            />
+          )}
+        </ScrollView>
+
+        {/* Footer Navigation */}
+        <View
+          style={[
+            styles.footer,
+            { paddingBottom: insets.bottom > 0 ? insets.bottom + 8 : Spacing.base },
+          ]}
+        >
+          <TouchableOpacity style={styles.backBtn} onPress={handleBack} disabled={loading}>
+            <Text style={styles.backBtnText}>{step === 1 ? 'Cancelar' : 'Voltar'}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.primaryBtn, loading && styles.primaryBtnDisabled]}
+            onPress={handleNext}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#000000" />
+            ) : (
+              <>
+                <Text style={styles.primaryBtnText}>{step === 4 ? 'Gerar com IA' : 'Próximo'}</Text>
+                <Ionicons
+                  name={step === 4 ? 'sparkles' : 'arrow-forward'}
+                  size={18}
+                  color="#000000"
+                />
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -118,15 +132,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  keyboardContainer: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     padding: Spacing.base,
-    paddingBottom: 110,
+    paddingBottom: Spacing.xl,
   },
   footer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: Colors.card,
     borderTopWidth: 1,
     borderTopColor: Colors.border,

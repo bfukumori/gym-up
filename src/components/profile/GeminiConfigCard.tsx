@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { BorderRadius, Colors, Spacing, Typography } from '../../constants/theme';
 
 interface GeminiConfigCardProps {
@@ -15,7 +16,14 @@ export function GeminiConfigCard({
   isSavedKey,
   onSaveKey,
 }: GeminiConfigCardProps) {
+  const [showKey, setShowKey] = useState(false);
   const hasKey = customKey.trim().length > 0;
+
+  const handleOpenAiStudio = () => {
+    Linking.openURL('https://aistudio.google.com/app/apikey').catch((err) => {
+      console.warn('Não foi possível abrir o link do Google AI Studio:', err);
+    });
+  };
 
   return (
     <View style={styles.configCard}>
@@ -35,15 +43,32 @@ export function GeminiConfigCard({
           : 'Se preferir não usar uma chave, o Gym-Up montará sua rotina automaticamente com nosso treino padrão inteligente.'}
       </Text>
 
-      <TextInput
-        style={styles.keyInput}
-        placeholder="Cole sua chave API aqui (opcional)"
-        placeholderTextColor={Colors.textDisabled}
-        value={customKey}
-        onChangeText={onChangeKey}
-        secureTextEntry
-        autoCapitalize="none"
-      />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.keyInput}
+          placeholder="Cole sua chave API aqui (opcional)"
+          placeholderTextColor={Colors.textDisabled}
+          value={customKey}
+          onChangeText={onChangeKey}
+          secureTextEntry={!showKey}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        {hasKey && (
+          <TouchableOpacity
+            style={styles.toggleVisibilityBtn}
+            onPress={() => setShowKey((prev) => !prev)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessibilityLabel={showKey ? 'Ocultar chave API' : 'Mostrar chave API'}
+          >
+            <Ionicons
+              name={showKey ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={Colors.textSecondary}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
 
       <TouchableOpacity
         style={[styles.saveKeyBtn, !hasKey && styles.saveKeyBtnMuted]}
@@ -58,13 +83,12 @@ export function GeminiConfigCard({
         </Text>
       </TouchableOpacity>
 
-      <View style={styles.freeKeyHint}>
-        <Ionicons name="information-circle-outline" size={16} color={Colors.accentBlue} />
+      <TouchableOpacity style={styles.freeKeyHint} onPress={handleOpenAiStudio} activeOpacity={0.7}>
+        <Ionicons name="open-outline" size={16} color={Colors.accentBlue} />
         <Text style={styles.freeKeyHintText}>
-          Você pode gerar uma chave gratuita a qualquer momento em{' '}
-          <Text style={styles.linkText}>aistudio.google.com</Text>
+          Gerar chave gratuita em <Text style={styles.linkText}>aistudio.google.com</Text>
         </Text>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -101,15 +125,29 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     marginBottom: Spacing.sm,
   },
+  inputContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+    marginBottom: Spacing.sm,
+  },
   keyInput: {
     backgroundColor: Colors.surface,
     color: Colors.textPrimary,
     borderRadius: BorderRadius.md,
-    padding: Spacing.sm + 2,
+    paddingVertical: Spacing.sm + 2,
+    paddingLeft: Spacing.sm + 2,
+    paddingRight: 40,
     borderWidth: 1,
     borderColor: Colors.border,
     fontSize: Typography.fontSizes.sm,
-    marginBottom: Spacing.sm,
+  },
+  toggleVisibilityBtn: {
+    position: 'absolute',
+    right: 10,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
   },
   saveKeyBtn: {
     backgroundColor: Colors.primary,
