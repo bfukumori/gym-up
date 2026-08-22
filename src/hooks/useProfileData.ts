@@ -49,8 +49,13 @@ export function useProfileData() {
   );
 
   const handleSaveApiKey = async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const sanitized = customKey.trim().replace(/^["']|["']$/g, '');
+    if (!sanitized) {
+      Alert.alert('Campo Vazio', 'Por favor, insira uma chave API do Gemini antes de salvar.');
+      return;
+    }
+
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setCustomKey(sanitized);
     await StorageService.saveCustomApiKey(sanitized);
     setIsSavedKey(true);

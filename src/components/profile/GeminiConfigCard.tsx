@@ -126,21 +126,22 @@ export function GeminiConfigCard({
       {/* Action Buttons */}
       <View style={styles.buttonRow}>
         <TouchableOpacity
-          style={[styles.saveKeyBtn, !hasKey && styles.saveKeyBtnMuted]}
+          style={[styles.saveKeyBtn, !hasKey && styles.saveKeyBtnDisabled]}
           onPress={onSaveKey}
+          disabled={!hasKey}
           activeOpacity={0.8}
         >
           <Ionicons
             name={isSavedKey ? 'checkmark-circle' : 'save-outline'}
             size={16}
-            color={!hasKey ? Colors.textSecondary : '#000000'}
+            color={!hasKey ? Colors.textDisabled : '#000000'}
           />
-          <Text style={[styles.saveKeyBtnText, !hasKey && styles.saveKeyBtnTextMuted]}>
-            {isSavedKey
-              ? 'Chave Salva com Sucesso ✓'
-              : hasKey
-                ? 'Salvar Chave API'
-                : 'Salvar Alterações'}
+          <Text style={[styles.saveKeyBtnText, !hasKey && styles.saveKeyBtnTextDisabled]}>
+            {!hasKey
+              ? 'Digite ou Cole uma Chave'
+              : isSavedKey
+                ? 'Chave Salva com Sucesso ✓'
+                : 'Salvar Chave API'}
           </Text>
         </TouchableOpacity>
 
@@ -286,18 +287,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  saveKeyBtnMuted: {
+  saveKeyBtnDisabled: {
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
+    opacity: 0.6,
   },
   saveKeyBtnText: {
     color: '#000000',
     fontSize: Typography.fontSizes.sm,
     fontWeight: '700',
   },
-  saveKeyBtnTextMuted: {
-    color: Colors.textSecondary,
+  saveKeyBtnTextDisabled: {
+    color: Colors.textDisabled,
+    fontWeight: '600',
   },
   removeKeyBtn: {
     backgroundColor: Colors.dangerMuted,
