@@ -30,6 +30,23 @@ export default function RootLayout() {
 
     initNotifications();
 
+    // Auto-check and apply OTA update on app startup
+    const checkUpdates = async () => {
+      if (__DEV__) return;
+      try {
+        const Updates = await import('expo-updates');
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (e) {
+        // Ignore offline / update check failures
+      }
+    };
+
+    checkUpdates();
+
     // Re-sync notifications when app returns to foreground
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') {

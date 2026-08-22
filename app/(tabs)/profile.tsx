@@ -55,7 +55,7 @@ export default function ProfileScreen() {
           ref={scrollRef}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: insets.bottom > 0 ? insets.bottom + 150 : 170 },
+            { paddingBottom: insets.bottom > 0 ? insets.bottom + 40 : 40 },
           ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
