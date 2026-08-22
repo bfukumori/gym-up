@@ -44,6 +44,7 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
+    "update:dev": "eas update --channel development",
     "update:preview": "eas update --channel preview",
     "update:prod": "eas update --channel production"
   },
