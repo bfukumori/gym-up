@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AchievementsGrid } from '../../src/components/profile/AchievementsGrid';
+import { AppUpdateCard } from '../../src/components/profile/AppUpdateCard';
 import { GeminiConfigCard } from '../../src/components/profile/GeminiConfigCard';
 import { LifetimeStatsRow } from '../../src/components/profile/LifetimeStatsRow';
 import { NotificationsCard } from '../../src/components/profile/NotificationsCard';
@@ -90,6 +91,9 @@ export default function ProfileScreen() {
             onRemoveKey={handleRemoveApiKey}
             onFocus={handleFocusKeyInput}
           />
+
+          {/* OTA Updates Information & Manual Check */}
+          <AppUpdateCard />
 
           {/* Data Reset */}
           <TouchableOpacity style={styles.resetBtn} onPress={handleResetAllData}>
