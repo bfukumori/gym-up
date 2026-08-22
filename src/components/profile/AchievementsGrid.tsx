@@ -9,6 +9,12 @@ interface AchievementsGridProps {
 }
 
 export function AchievementsGrid({ achievements, unlockedCount }: AchievementsGridProps) {
+  // Chunk achievements into pairs of 2 for a symmetrical, pixel-perfect 2-column grid
+  const rows: Achievement[][] = [];
+  for (let i = 0; i < achievements.length; i += 2) {
+    rows.push(achievements.slice(i, i + 2));
+  }
+
   return (
     <View>
       <View style={styles.sectionHeader}>
@@ -21,42 +27,53 @@ export function AchievementsGrid({ achievements, unlockedCount }: AchievementsGr
         </Text>
       </View>
 
-      <View style={styles.achievementsGrid}>
-        {achievements.map((ach) => {
-          const isUnlocked = Boolean(ach.unlockedAt);
-          return (
-            <View
-              key={ach.id}
-              style={[styles.achievementCard, isUnlocked && styles.achievementCardUnlocked]}
-            >
-              <View
-                style={[styles.achievementIconBox, isUnlocked && styles.achievementIconBoxUnlocked]}
-              >
-                <Ionicons
-                  name={isUnlocked ? 'ribbon' : 'lock-closed'}
-                  size={22}
-                  color={isUnlocked ? Colors.accentGold : Colors.textDisabled}
-                />
-              </View>
-              <Text
-                style={[styles.achievementName, isUnlocked && styles.achievementNameUnlocked]}
-                numberOfLines={1}
-              >
-                {ach.title}
-              </Text>
-              <Text style={styles.achievementDesc} numberOfLines={2}>
-                {ach.description}
-              </Text>
-              <View style={styles.achievementXpPill}>
-                <Text
-                  style={[styles.achievementXpText, isUnlocked && styles.achievementXpTextUnlocked]}
+      <View style={styles.gridContainer}>
+        {rows.map((pair, rowIdx) => (
+          <View key={pair[0]?.id || rowIdx} style={styles.row}>
+            {pair.map((ach) => {
+              const isUnlocked = Boolean(ach.unlockedAt);
+              return (
+                <View
+                  key={ach.id}
+                  style={[styles.achievementCard, isUnlocked && styles.achievementCardUnlocked]}
                 >
-                  +{ach.xpReward} XP
-                </Text>
-              </View>
-            </View>
-          );
-        })}
+                  <View
+                    style={[
+                      styles.achievementIconBox,
+                      isUnlocked && styles.achievementIconBoxUnlocked,
+                    ]}
+                  >
+                    <Ionicons
+                      name={isUnlocked ? 'ribbon' : 'lock-closed'}
+                      size={22}
+                      color={isUnlocked ? Colors.accentGold : Colors.textDisabled}
+                    />
+                  </View>
+                  <Text
+                    style={[styles.achievementName, isUnlocked && styles.achievementNameUnlocked]}
+                    numberOfLines={1}
+                  >
+                    {ach.title}
+                  </Text>
+                  <Text style={styles.achievementDesc} numberOfLines={2}>
+                    {ach.description}
+                  </Text>
+                  <View style={styles.achievementXpPill}>
+                    <Text
+                      style={[
+                        styles.achievementXpText,
+                        isUnlocked && styles.achievementXpTextUnlocked,
+                      ]}
+                    >
+                      +{ach.xpReward} XP
+                    </Text>
+                  </View>
+                </View>
+              );
+            })}
+            {pair.length === 1 && <View style={[styles.achievementCard, styles.placeholderCard]} />}
+          </View>
+        ))}
       </View>
     </View>
   );
@@ -84,20 +101,26 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSizes.sm,
     fontWeight: '800',
   },
-  achievementsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  gridContainer: {
     gap: Spacing.sm,
     marginBottom: Spacing.lg,
   },
+  row: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
   achievementCard: {
-    width: '48%',
+    flex: 1,
     backgroundColor: Colors.card,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border,
     alignItems: 'center',
+  },
+  placeholderCard: {
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
   achievementCardUnlocked: {
     borderColor: 'rgba(255, 215, 0, 0.4)',
