@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DayOverviewCard } from '../../src/components/plan/DayOverviewCard';
 import { DaySelectorTabs } from '../../src/components/plan/DaySelectorTabs';
+import { DefaultPlanSelectorModal } from '../../src/components/plan/DefaultPlanSelectorModal';
 import { PlanExerciseItem } from '../../src/components/plan/PlanExerciseItem';
 import { BorderRadius, Colors, Spacing, Typography } from '../../src/constants/theme';
 import { usePlanData } from '../../src/hooks/usePlanData';
@@ -12,28 +13,71 @@ import { usePlanData } from '../../src/hooks/usePlanData';
 export default function PlanScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { plan, selectedDayIdx, setSelectedDayIdx, activeDay, handleResetPlan } = usePlanData();
+  const {
+    plan,
+    selectedDayIdx,
+    setSelectedDayIdx,
+    activeDay,
+    hasGeminiKey,
+    defaultPlansModalVisible,
+    setDefaultPlansModalVisible,
+    handleSelectPlan,
+    handleResetPlan,
+  } = usePlanData();
 
   if (!plan?.days || plan.days.length === 0) {
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconBox}>
-            <Ionicons name="barbell-outline" size={40} color={Colors.primary} />
+            <Ionicons
+              name={hasGeminiKey ? 'sparkles' : 'barbell-outline'}
+              size={40}
+              color={Colors.primary}
+            />
           </View>
           <Text style={styles.emptyTitle}>Nenhuma ficha ativa</Text>
           <Text style={styles.emptyDesc}>
-            Crie sua rotina personalizada em poucos segundos com a inteligência do Gemini.
+            {hasGeminiKey
+              ? 'Monte sua rotina personalizada com inteligência artificial ou escolha um dos nossos treinos padrão prontos.'
+              : 'Selecione uma ficha padrão balanceada (Iniciante, Intermediário ou Avançado) em 1 clique.'}
           </Text>
 
           <TouchableOpacity
             style={styles.createBtn}
-            onPress={() => router.push('/onboarding/quiz')}
+            onPress={() => setDefaultPlansModalVisible(true)}
           >
-            <Ionicons name="sparkles" size={18} color="#000000" />
-            <Text style={styles.createBtnText}>Montar Treino com IA</Text>
+            <Ionicons name="flash" size={18} color="#000000" />
+            <Text style={styles.createBtnText}>Escolher Treino Padrão</Text>
           </TouchableOpacity>
+
+          {hasGeminiKey ? (
+            <TouchableOpacity
+              style={styles.secondaryQuizBtn}
+              onPress={() => router.push('/onboarding/quiz')}
+            >
+              <Ionicons name="sparkles" size={16} color={Colors.primary} />
+              <Text style={styles.secondaryQuizBtnText}>Montar com Assistente IA</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.secondaryQuizBtn}
+              onPress={() => router.push('/(tabs)/profile')}
+            >
+              <Ionicons name="sparkles" size={14} color={Colors.accentBlue} />
+              <Text style={styles.secondaryLinkText}>Adicionar chave Gemini para IA personalizada</Text>
+            </TouchableOpacity>
+          )}
         </View>
+
+        <DefaultPlanSelectorModal
+          visible={defaultPlansModalVisible}
+          onClose={() => setDefaultPlansModalVisible(false)}
+          onSelectPlan={handleSelectPlan}
+          hasGeminiKey={hasGeminiKey}
+          onOpenQuiz={() => router.push('/onboarding/quiz')}
+          onOpenProfile={() => router.push('/(tabs)/profile')}
+        />
       </View>
     );
   }
@@ -50,8 +94,8 @@ export default function PlanScreen() {
         </View>
 
         <TouchableOpacity style={styles.recreateBtn} onPress={handleResetPlan}>
-          <Ionicons name="refresh" size={16} color={Colors.primary} />
-          <Text style={styles.recreateBtnText}>Nova IA</Text>
+          <Ionicons name="swap-horizontal" size={16} color={Colors.primary} />
+          <Text style={styles.recreateBtnText}>Trocar</Text>
         </TouchableOpacity>
       </View>
 
@@ -92,6 +136,16 @@ export default function PlanScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* Default Plan Selector Modal */}
+      <DefaultPlanSelectorModal
+        visible={defaultPlansModalVisible}
+        onClose={() => setDefaultPlansModalVisible(false)}
+        onSelectPlan={handleSelectPlan}
+        hasGeminiKey={hasGeminiKey}
+        onOpenQuiz={() => router.push('/onboarding/quiz')}
+        onOpenProfile={() => router.push('/(tabs)/profile')}
+      />
     </View>
   );
 }
@@ -205,10 +259,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
+    width: '100%',
+    justifyContent: 'center',
   },
   createBtnText: {
     color: '#000000',
     fontSize: Typography.fontSizes.base,
     fontWeight: '800',
+  },
+  secondaryQuizBtn: {
+    marginTop: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: Spacing.xs,
+  },
+  secondaryQuizBtnText: {
+    color: Colors.primary,
+    fontSize: Typography.fontSizes.sm,
+    fontWeight: '700',
+  },
+  secondaryLinkText: {
+    color: Colors.accentBlue,
+    fontSize: Typography.fontSizes.xs,
+    fontWeight: '600',
   },
 });

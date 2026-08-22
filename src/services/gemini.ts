@@ -16,6 +16,11 @@ export async function getActiveApiKey(): Promise<string> {
   return process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
 }
 
+export async function hasGeminiApiKey(): Promise<boolean> {
+  const key = await getActiveApiKey();
+  return Boolean(key && key.trim().length > 0);
+}
+
 export function generatePromptForWorkout(answers: QuizAnswers): string {
   const goalLabels: Record<string, string> = {
     hypertrophy: 'Hipertrofia Muscular (Ganho de Massa)',

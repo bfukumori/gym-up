@@ -2,7 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert } from 'react-native';
-import { GeminiService } from '../services/gemini';
+import { GeminiService, getActiveApiKey } from '../services/gemini';
 import type { EquipmentType, ExperienceLevel, GoalType, QuizAnswers } from '../types';
 
 export function useQuizForm() {
@@ -30,6 +30,25 @@ export function useQuizForm() {
   const generatePlan = async () => {
     try {
       setLoading(true);
+      const hasKey = await getActiveApiKey();
+      if (!hasKey || hasKey.trim().length === 0) {
+        Alert.alert(
+          'Chave Gemini Necessária 🔑',
+          'A montagem personalizada com IA requer a configuração da sua chave do Google AI Studio. Você pode escolher uma ficha padrão pronta ou configurar a chave no Perfil.',
+          [
+            {
+              text: 'Ver Fichas Padrão',
+              onPress: () => router.replace('/(tabs)/plan'),
+            },
+            {
+              text: 'Configurar Chave',
+              onPress: () => router.replace('/(tabs)/profile'),
+            },
+          ]
+        );
+        return;
+      }
+
       const answers: QuizAnswers = {
         goal,
         daysPerWeek,
@@ -55,8 +74,7 @@ export function useQuizForm() {
       );
     } catch (error) {
       console.error(error);
-      Alert.alert('Aviso', 'O treino foi estruturado com sucesso usando o modelo local.');
-      router.replace('/(tabs)/plan');
+      Alert.alert('Erro ao Gerar Treino', 'Não foi possível conectar com o Gemini. Verifique sua chave API no Perfil.');
     } finally {
       setLoading(false);
     }

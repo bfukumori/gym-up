@@ -1,5 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
+import { hasGeminiApiKey } from '../services/gemini';
 import { StorageService } from '../services/storage';
 import type { UserStats, WorkoutPlan, WorkoutSessionLog } from '../types';
 
@@ -21,16 +22,20 @@ export function useHomeData() {
   const [plan, setPlan] = useState<WorkoutPlan | null>(null);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [weeklyLogs, setWeeklyLogs] = useState<WorkoutSessionLog[]>([]);
+  const [hasGeminiKey, setHasGeminiKey] = useState(false);
+  const [defaultPlansModalVisible, setDefaultPlansModalVisible] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
-      const [userStats, workoutPlan, logs] = await Promise.all([
+      const [userStats, workoutPlan, logs, hasKey] = await Promise.all([
         StorageService.getUserStats(),
         StorageService.getWorkoutPlan(),
         StorageService.getSessionLogs(),
+        hasGeminiApiKey(),
       ]);
       setStats(userStats);
       setPlan(workoutPlan);
+      setHasGeminiKey(hasKey);
 
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -53,6 +58,12 @@ export function useHomeData() {
     setRefreshing(false);
   };
 
+  const handleSelectPlan = async (selectedPlan: WorkoutPlan) => {
+    await StorageService.saveWorkoutPlan(selectedPlan);
+    setPlan(selectedPlan);
+    setSelectedDayIndex(0);
+  };
+
   const activeDay = plan?.days?.[selectedDayIndex] || plan?.days?.[0];
   const targetDaysPerWeek = plan?.answers?.daysPerWeek || 4;
   const workoutsThisWeek = weeklyLogs.length;
@@ -72,5 +83,10 @@ export function useHomeData() {
     workoutsThisWeek,
     targetDaysPerWeek,
     weekProgressPercent,
+    hasGeminiKey,
+    defaultPlansModalVisible,
+    setDefaultPlansModalVisible,
+    handleSelectPlan,
   };
 }
+

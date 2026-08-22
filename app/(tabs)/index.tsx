@@ -6,6 +6,7 @@ import { EmptyPlanCard } from '../../src/components/home/EmptyPlanCard';
 import { QuickStatsGrid } from '../../src/components/home/QuickStatsGrid';
 import { TodayWorkoutCard } from '../../src/components/home/TodayWorkoutCard';
 import { WeeklyAdherenceCard } from '../../src/components/home/WeeklyAdherenceCard';
+import { DefaultPlanSelectorModal } from '../../src/components/plan/DefaultPlanSelectorModal';
 import { XpHeader } from '../../src/components/XpHeader';
 import { Colors, Spacing, Typography } from '../../src/constants/theme';
 import { useHomeData } from '../../src/hooks/useHomeData';
@@ -24,6 +25,10 @@ export default function HomeScreen() {
     workoutsThisWeek,
     targetDaysPerWeek,
     weekProgressPercent,
+    hasGeminiKey,
+    defaultPlansModalVisible,
+    setDefaultPlansModalVisible,
+    handleSelectPlan,
   } = useHomeData();
 
   return (
@@ -75,12 +80,26 @@ export default function HomeScreen() {
             onSelectDayIndex={setSelectedDayIndex}
           />
         ) : (
-          <EmptyPlanCard />
+          <EmptyPlanCard
+            hasGeminiKey={hasGeminiKey}
+            onOpenDefaultPlans={() => setDefaultPlansModalVisible(true)}
+            onOpenQuiz={() => router.push('/onboarding/quiz')}
+          />
         )}
 
         {/* Quick Stats Grid */}
         <QuickStatsGrid stats={stats} />
       </ScrollView>
+
+      {/* Default Plan Selector Modal */}
+      <DefaultPlanSelectorModal
+        visible={defaultPlansModalVisible}
+        onClose={() => setDefaultPlansModalVisible(false)}
+        onSelectPlan={handleSelectPlan}
+        hasGeminiKey={hasGeminiKey}
+        onOpenQuiz={() => router.push('/onboarding/quiz')}
+        onOpenProfile={() => router.push('/(tabs)/profile')}
+      />
     </View>
   );
 }
