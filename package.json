@@ -4,7 +4,7 @@
   "description": "Aplicativo mobile pessoal e gamificado para gerenciamento de treinos na academia integrado ao Google Gemini.",
   "author": "Bruno Fukumori <brunofukumori@gmail.com>",
   "license": "MIT",
-  "main": "expo-router/entry",
+  "main": "index.js",
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
     "@google/genai": "^2.18.0",

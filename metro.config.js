@@ -17,9 +17,8 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     moduleName === './node_modules/expo-router/entry' ||
     moduleName === 'expo-router/entry.js'
   ) {
-    const real = fs.realpathSync(path.resolve(projectRoot, 'node_modules/expo-router/entry.js'));
     return {
-      filePath: real,
+      filePath: fs.realpathSync(path.resolve(projectRoot, 'node_modules/expo-router/entry.js')),
       type: 'sourceFile',
     };
   }
@@ -28,46 +27,33 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     moduleName === './node_modules/expo-router/entry-classic' ||
     moduleName === 'expo-router/entry-classic.js'
   ) {
-    const real = fs.realpathSync(
-      path.resolve(projectRoot, 'node_modules/expo-router/entry-classic.js')
-    );
     return {
-      filePath: real,
-      type: 'sourceFile',
-    };
-  }
-  if (moduleName === 'expo-router/_ctx') {
-    const ctxFile =
-      platform === 'android' ? '_ctx.android.js' : platform === 'ios' ? '_ctx.ios.js' : '_ctx.js';
-    const real = fs.realpathSync(path.resolve(projectRoot, 'node_modules/expo-router', ctxFile));
-    return {
-      filePath: real,
+      filePath: fs.realpathSync(
+        path.resolve(projectRoot, 'node_modules/expo-router/entry-classic.js')
+      ),
       type: 'sourceFile',
     };
   }
 
-  // Handle bare module imports from symlinked pnpm packages using Node module resolution
-  if (!moduleName.startsWith('.') && !moduleName.startsWith('/')) {
-    try {
-      const resolved = require.resolve(moduleName, {
-        paths: [
-          path.dirname(context.originModulePath),
-          projectRoot,
-          path.resolve(projectRoot, 'node_modules'),
-          path.resolve(projectRoot, 'node_modules/expo/node_modules'),
-        ],
-      });
-      return {
-        filePath: fs.realpathSync(resolved),
-        type: 'sourceFile',
-      };
-    } catch {}
+  try {
+    if (originalResolveRequest) {
+      return originalResolveRequest(context, moduleName, platform);
+    }
+    return context.resolveRequest(context, moduleName, platform);
+  } catch (err) {
+    if (!moduleName.startsWith('.') && !moduleName.startsWith('/')) {
+      try {
+        const resolved = require.resolve(moduleName, {
+          paths: [path.resolve(projectRoot, 'node_modules')],
+        });
+        return {
+          filePath: fs.realpathSync(resolved),
+          type: 'sourceFile',
+        };
+      } catch {}
+    }
+    throw err;
   }
-
-  if (originalResolveRequest) {
-    return originalResolveRequest(context, moduleName, platform);
-  }
-  return context.resolveRequest(context, moduleName, platform);
 };
 
 module.exports = config;
