@@ -53,10 +53,6 @@
       "barStyle": "light-content",
       "translucent": true
     },
-    "androidNavigationBar": {
-      "backgroundColor": "#0B0E14",
-      "barStyle": "light-content"
-    },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
