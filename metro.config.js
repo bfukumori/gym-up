@@ -44,7 +44,11 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     if (!moduleName.startsWith('.') && !moduleName.startsWith('/')) {
       try {
         const resolved = require.resolve(moduleName, {
-          paths: [path.resolve(projectRoot, 'node_modules')],
+          paths: [
+            path.dirname(context.originModulePath),
+            projectRoot,
+            path.resolve(projectRoot, 'node_modules'),
+          ],
         });
         return {
           filePath: fs.realpathSync(resolved),
