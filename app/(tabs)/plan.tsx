@@ -62,7 +62,7 @@ export default function PlanScreen() {
           ) : (
             <TouchableOpacity
               style={styles.secondaryQuizBtn}
-              onPress={() => router.push('/(tabs)/profile')}
+              onPress={() => router.navigate('/(tabs)/profile')}
             >
               <Ionicons name="sparkles" size={14} color={Colors.accentBlue} />
               <Text style={styles.secondaryLinkText}>

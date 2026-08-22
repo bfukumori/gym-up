@@ -55,7 +55,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={styles.settingsIconBtn}
-            onPress={() => router.push('/(tabs)/profile')}
+            onPress={() => router.navigate('/(tabs)/profile')}
           >
             <Ionicons name="settings-sharp" size={20} color={Colors.textSecondary} />
           </TouchableOpacity>
