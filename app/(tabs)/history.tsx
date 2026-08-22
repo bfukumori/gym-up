@@ -1,4 +1,6 @@
 import * as Haptics from 'expo-haptics';
+import { useObserve } from 'expo-observe';
+import { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MonthlyReportView } from '../../src/components/history/MonthlyReportView';
@@ -8,7 +10,12 @@ import { BorderRadius, Colors, Spacing, Typography } from '../../src/constants/t
 import { useHistoryData } from '../../src/hooks/useHistoryData';
 
 export default function HistoryScreen() {
+  const { markInteractive } = useObserve();
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    markInteractive();
+  }, [markInteractive]);
   const { viewMode, setViewMode, logs, weeklyStats, monthlyStats } = useHistoryData();
 
   return (

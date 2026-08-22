@@ -1,4 +1,5 @@
 import * as Haptics from 'expo-haptics';
+import { Observe } from 'expo-observe';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert } from 'react-native';
@@ -61,6 +62,13 @@ export function useQuizForm() {
       };
 
       await GeminiService.generateWorkoutPlan(answers);
+      Observe.logEvent('ai_plan.generated', {
+        attributes: {
+          goal,
+          daysPerWeek,
+          experience,
+        },
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
         'Treino Gerado com Sucesso! 🚀',

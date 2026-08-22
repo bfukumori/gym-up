@@ -1,4 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useObserve } from 'expo-observe';
+import { useEffect } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -19,7 +21,12 @@ import { Colors, Spacing, Typography } from '../../src/constants/theme';
 import { useQuizForm } from '../../src/hooks/useQuizForm';
 
 export default function QuizScreen() {
+  const { markInteractive } = useObserve();
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    markInteractive();
+  }, [markInteractive]);
   const {
     step,
     loading,

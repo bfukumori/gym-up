@@ -1,5 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useObserve } from 'expo-observe';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -19,9 +21,14 @@ import { BorderRadius, Colors, Spacing, Typography } from '../../src/constants/t
 import { useWorkoutSession } from '../../src/hooks/useWorkoutSession';
 
 export default function ActiveWorkoutScreen() {
+  const { markInteractive } = useObserve();
   const { dayId } = useLocalSearchParams<{ dayId: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    markInteractive();
+  }, [markInteractive]);
 
   const {
     loading,

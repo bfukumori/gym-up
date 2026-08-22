@@ -1,5 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useObserve } from 'expo-observe';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyPlanCard } from '../../src/components/home/EmptyPlanCard';
@@ -12,8 +14,13 @@ import { Colors, Spacing, Typography } from '../../src/constants/theme';
 import { useHomeData } from '../../src/hooks/useHomeData';
 
 export default function HomeScreen() {
+  const { markInteractive } = useObserve();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    markInteractive();
+  }, [markInteractive]);
   const {
     stats,
     plan,

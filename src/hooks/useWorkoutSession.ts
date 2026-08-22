@@ -1,4 +1,5 @@
 import * as Haptics from 'expo-haptics';
+import { Observe } from 'expo-observe';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
@@ -179,6 +180,23 @@ export function useWorkoutSession(dayId: string | undefined) {
       await StorageService.saveSessionLog(sessionLog);
       const result = await GamificationService.processCompletedWorkout(sessionLog);
       await NotificationService.onWorkoutCompleted();
+
+      Observe.logEvent('workout.completed', {
+        attributes: {
+          durationMinutes: sessionLog.durationMinutes,
+          totalSetsCompleted: totalCompletedSets,
+          totalVolumeKg: totalVolume,
+          xpEarned: earnedXp,
+        },
+      });
+
+      if (result.leveledUp && result.newLevel) {
+        Observe.logEvent('user.leveled_up', {
+          attributes: {
+            newLevel: result.newLevel,
+          },
+        });
+      }
 
       setXpEarned(earnedXp);
       setLeveledUp(result.leveledUp);

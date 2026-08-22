@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useObserve } from 'expo-observe';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DayOverviewCard } from '../../src/components/plan/DayOverviewCard';
@@ -11,8 +13,13 @@ import { BorderRadius, Colors, Spacing, Typography } from '../../src/constants/t
 import { usePlanData } from '../../src/hooks/usePlanData';
 
 export default function PlanScreen() {
+  const { markInteractive } = useObserve();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    markInteractive();
+  }, [markInteractive]);
   const {
     plan,
     selectedDayIdx,

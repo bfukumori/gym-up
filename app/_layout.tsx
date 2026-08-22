@@ -1,3 +1,4 @@
+import { Observe, ObserveRoot, useObserve } from 'expo-observe';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -8,13 +9,23 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors } from '../src/constants/theme';
 import { NotificationService } from '../src/services/notifications';
 
+// Configure EAS Observe with Expo Router integration at module scope
+Observe.configure({
+  integrations: { 'expo-router': true },
+});
+
 // Ensure native window background is dark
 SystemUI.setBackgroundColorAsync(Colors.background).catch(() => {});
 
 // Dismiss splash screen immediately
 SplashScreen.hideAsync().catch(() => {});
 
-export default function RootLayout() {
+function RootLayout() {
+  const { markInteractive } = useObserve();
+
+  useEffect(() => {
+    markInteractive();
+  }, [markInteractive]);
   useEffect(() => {
     // Initial sync of workout reminders if already permitted
     const initNotifications = async () => {
@@ -73,3 +84,5 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+export default ObserveRoot.wrap(RootLayout);

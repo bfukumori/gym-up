@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRef } from 'react';
+import { useObserve } from 'expo-observe';
+import { useEffect, useRef } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -20,8 +21,13 @@ import { Colors, Spacing, Typography } from '../../src/constants/theme';
 import { useProfileData } from '../../src/hooks/useProfileData';
 
 export default function ProfileScreen() {
+  const { markInteractive } = useObserve();
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    markInteractive();
+  }, [markInteractive]);
   const {
     stats,
     achievements,
