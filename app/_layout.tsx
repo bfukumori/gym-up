@@ -1,30 +1,29 @@
+import { Observe, ObserveRoot, useObserve } from 'expo-observe';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors } from '../src/constants/theme';
 import { NotificationService } from '../src/services/notifications';
 
-// Ensure splash screen is hidden safely
-SplashScreen.hideAsync().catch(() => {});
+Observe.configure({
+  integrations: { 'expo-router': true },
+});
 
-export default function RootLayout() {
+SplashScreen.preventAutoHideAsync();
+
+function RootLayout() {
+  const [isReady, setIsReady] = useState(false);
+  const { markInteractive } = useObserve();
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      SplashScreen.hideAsync().catch(() => {});
-    }, 50);
-
     // Initial sync of workout reminders if already permitted
     const initNotifications = async () => {
-      try {
-        const hasPerms = await NotificationService.hasPermissions();
-        if (hasPerms) {
-          await NotificationService.syncWorkoutReminders();
-        }
-      } catch (e) {
-        console.error('Error initializing notifications:', e);
+      const hasPerms = await NotificationService.hasPermissions();
+      if (hasPerms) {
+        await NotificationService.syncWorkoutReminders();
       }
     };
 
@@ -33,15 +32,27 @@ export default function RootLayout() {
     // Re-sync notifications when app returns to foreground
     const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') {
-        NotificationService.syncWorkoutReminders().catch(() => {});
+        NotificationService.syncWorkoutReminders();
       }
     });
 
+    setIsReady(true);
+
     return () => {
-      clearTimeout(timer);
       subscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (isReady) {
+      SplashScreen.hide();
+      markInteractive();
+    }
+  }, [isReady, markInteractive]);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider style={{ backgroundColor: Colors.background, flex: 1 }}>
@@ -74,3 +85,5 @@ export default function RootLayout() {
     </SafeAreaProvider>
   );
 }
+
+export default ObserveRoot.wrap(RootLayout);
