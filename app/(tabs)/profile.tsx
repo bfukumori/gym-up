@@ -48,8 +48,7 @@ export default function ProfileScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 30}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardContainer}
       >
         <ScrollView
