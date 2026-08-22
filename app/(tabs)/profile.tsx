@@ -30,6 +30,8 @@ export default function ProfileScreen() {
     isSavedKey,
     setIsSavedKey,
     hasNotificationsPermission,
+    morningReminderTime,
+    handleChangeMorningReminderTime,
     handleSaveApiKey,
     handleRemoveApiKey,
     handleEnableOrTestNotifications,
@@ -72,6 +74,8 @@ export default function ProfileScreen() {
           <NotificationsCard
             hasPermission={hasNotificationsPermission}
             onEnableOrTest={handleEnableOrTestNotifications}
+            morningTime={morningReminderTime}
+            onChangeMorningTime={handleChangeMorningReminderTime}
           />
 
           {/* Gemini API Key Configuration Section */}

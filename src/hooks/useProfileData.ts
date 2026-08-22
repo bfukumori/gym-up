@@ -25,17 +25,21 @@ export function useProfileData() {
   const [customKey, setCustomKey] = useState('');
   const [isSavedKey, setIsSavedKey] = useState(false);
   const [hasNotificationsPermission, setHasNotificationsPermission] = useState(false);
+  const [morningReminderTime, setMorningReminderTime] = useState('11:30');
 
   const loadProfileData = useCallback(async () => {
-    const [userStats, userAchievements, key, notificationsAllowed] = await Promise.all([
-      StorageService.getUserStats(),
-      StorageService.getAchievements(),
-      StorageService.getCustomApiKey(),
-      NotificationService.hasPermissions(),
-    ]);
+    const [userStats, userAchievements, key, notificationsAllowed, savedMorningTime] =
+      await Promise.all([
+        StorageService.getUserStats(),
+        StorageService.getAchievements(),
+        StorageService.getCustomApiKey(),
+        NotificationService.hasPermissions(),
+        StorageService.getMorningReminderTime(),
+      ]);
     setStats(userStats);
     setAchievements(userAchievements);
     setHasNotificationsPermission(notificationsAllowed);
+    setMorningReminderTime(savedMorningTime);
     if (key) {
       setCustomKey(key);
       setIsSavedKey(true);
@@ -60,6 +64,13 @@ export function useProfileData() {
       subscription.remove();
     };
   }, []);
+
+  const handleChangeMorningReminderTime = async (newTime: string) => {
+    Haptics.selectionAsync();
+    setMorningReminderTime(newTime);
+    await StorageService.saveMorningReminderTime(newTime);
+    await NotificationService.syncWorkoutReminders();
+  };
 
   const handleSaveApiKey = async () => {
     const sanitized = customKey.trim().replace(/^["']|["']$/g, '');
@@ -96,7 +107,7 @@ export function useProfileData() {
       await NotificationService.syncWorkoutReminders();
       Alert.alert(
         'Notificação de Teste Enviada! 🚀',
-        'Uma notificação de teste será exibida em instantes. Os lembretes diários (11:30) e condicional (18:00 se não treinou) estão ativos.'
+        `Uma notificação de teste será exibida em instantes. Os lembretes diários (${morningReminderTime}) e condicional (18:00 se não treinou) estão ativos.`
       );
     } else {
       Alert.alert(
@@ -147,6 +158,8 @@ export function useProfileData() {
     isSavedKey,
     setIsSavedKey,
     hasNotificationsPermission,
+    morningReminderTime,
+    handleChangeMorningReminderTime,
     handleSaveApiKey,
     handleRemoveApiKey,
     handleEnableOrTestNotifications,

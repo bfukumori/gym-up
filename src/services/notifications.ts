@@ -153,7 +153,12 @@ export const NotificationService = {
         return;
       }
 
-      // 1. Schedule / ensure 11:30 AM daily recurring reminder
+      // 1. Schedule / ensure morning daily recurring reminder with user-configured time
+      const morningTime = await StorageService.getMorningReminderTime();
+      const [mHourStr, mMinStr] = morningTime.split(':');
+      const mHour = Number.parseInt(mHourStr || '11', 10);
+      const mMin = Number.parseInt(mMinStr || '30', 10);
+
       await Notifications.cancelScheduledNotificationAsync(NOTIFICATION_IDS.MORNING);
       await Notifications.scheduleNotificationAsync({
         identifier: NOTIFICATION_IDS.MORNING,
@@ -166,8 +171,8 @@ export const NotificationService = {
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DAILY,
-          hour: 11,
-          minute: 30,
+          hour: Number.isNaN(mHour) ? 11 : mHour,
+          minute: Number.isNaN(mMin) ? 30 : mMin,
           channelId: NOTIFICATION_CHANNEL_ID,
         },
       });
@@ -240,11 +245,13 @@ export const NotificationService = {
       const permitted = await this.requestPermissions();
       if (!permitted) return false;
 
+      const morningTime = await StorageService.getMorningReminderTime();
+
       await Notifications.scheduleNotificationAsync({
         identifier: NOTIFICATION_IDS.TEST,
         content: {
           title: 'Notificações do GymUp ativas! 🚀',
-          body: 'Lembretes diários às 11:30 e às 18:00 configurados com sucesso.',
+          body: `Lembretes diários às ${morningTime} e às 18:00 configurados com sucesso.`,
           sound: true,
           priority: Notifications.AndroidNotificationPriority.MAX,
           data: { type: 'test' },

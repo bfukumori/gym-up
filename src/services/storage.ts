@@ -9,6 +9,7 @@ const KEYS = {
   USER_STATS: '@gymup_user_stats',
   ACHIEVEMENTS: '@gymup_achievements',
   LAST_ACTIVE_DAY: '@gymup_last_active_day',
+  MORNING_REMINDER_TIME: '@gymup_morning_reminder_time',
 };
 
 const SECURE_KEYS = {
@@ -152,6 +153,24 @@ export const StorageService = {
       }
     } catch (e) {
       console.error('Error saving secure custom API key:', e);
+    }
+  },
+
+  // --- Notification Reminder Times ---
+  async getMorningReminderTime(): Promise<string> {
+    try {
+      const saved = await AsyncStorage.getItem(KEYS.MORNING_REMINDER_TIME);
+      return saved && saved.trim().length > 0 ? saved.trim() : '11:30';
+    } catch {
+      return '11:30';
+    }
+  },
+
+  async saveMorningReminderTime(time: string): Promise<void> {
+    try {
+      await AsyncStorage.setItem(KEYS.MORNING_REMINDER_TIME, time);
+    } catch (e) {
+      console.error('Error saving morning reminder time:', e);
     }
   },
 
