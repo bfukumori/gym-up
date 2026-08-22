@@ -19,10 +19,12 @@ function RootLayout() {
   const { markInteractive } = useObserve();
 
   useEffect(() => {
-    // Initial sync and request permissions on mount
+    // Initial sync of workout reminders if already permitted
     const initNotifications = async () => {
-      await NotificationService.requestPermissions();
-      await NotificationService.syncWorkoutReminders();
+      const hasPerms = await NotificationService.hasPermissions();
+      if (hasPerms) {
+        await NotificationService.syncWorkoutReminders();
+      }
     };
 
     initNotifications();

@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Alert } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, AppState, type AppStateStatus, Linking } from 'react-native';
 import { NotificationService } from '../services/notifications';
 import { StorageService } from '../services/storage';
 import type { Achievement, UserStats } from '../types';
@@ -48,6 +48,19 @@ export function useProfileData() {
     }, [loadProfileData])
   );
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+      if (nextState === 'active') {
+        const permitted = await NotificationService.hasPermissions();
+        setHasNotificationsPermission(permitted);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   const handleSaveApiKey = async () => {
     const sanitized = customKey.trim().replace(/^["']|["']$/g, '');
     if (!sanitized) {
@@ -87,8 +100,17 @@ export function useProfileData() {
       );
     } else {
       Alert.alert(
-        'Permissão Necessária',
-        'Habilite as notificações nas configurações do seu aparelho para receber os lembretes de treino.'
+        'Permissão de Notificações',
+        'As notificações estão desativadas para o GymUp. Deseja abrir as configurações do aparelho para ativá-las?',
+        [
+          { text: 'Agora Não', style: 'cancel' },
+          {
+            text: 'Abrir Configurações',
+            onPress: () => {
+              Linking.openSettings();
+            },
+          },
+        ]
       );
     }
   };
