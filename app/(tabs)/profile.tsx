@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRef } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -19,6 +20,7 @@ import { useProfileData } from '../../src/hooks/useProfileData';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef<ScrollView>(null);
   const {
     stats,
     achievements,
@@ -34,14 +36,25 @@ export default function ProfileScreen() {
     handleResetAllData,
   } = useProfileData();
 
+  const handleFocusKeyInput = () => {
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 150);
+  };
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 30}
         style={styles.keyboardContainer}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          ref={scrollRef}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: insets.bottom > 0 ? insets.bottom + 150 : 170 },
+          ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
@@ -71,6 +84,7 @@ export default function ProfileScreen() {
             isSavedKey={isSavedKey}
             onSaveKey={handleSaveApiKey}
             onRemoveKey={handleRemoveApiKey}
+            onFocus={handleFocusKeyInput}
           />
 
           {/* Data Reset */}
@@ -94,7 +108,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.base,
-    paddingBottom: 40,
     paddingTop: Spacing.sm,
   },
   resetBtn: {

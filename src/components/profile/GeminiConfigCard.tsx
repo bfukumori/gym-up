@@ -9,6 +9,7 @@ interface GeminiConfigCardProps {
   isSavedKey: boolean;
   onSaveKey: () => void;
   onRemoveKey?: () => void;
+  onFocus?: () => void;
 }
 
 export function GeminiConfigCard({
@@ -17,6 +18,7 @@ export function GeminiConfigCard({
   isSavedKey,
   onSaveKey,
   onRemoveKey,
+  onFocus,
 }: GeminiConfigCardProps) {
   const [showKey, setShowKey] = useState(false);
   const trimmedKey = customKey.trim();
@@ -84,6 +86,7 @@ export function GeminiConfigCard({
             secureTextEntry={!showKey}
             autoCapitalize="none"
             autoCorrect={false}
+            onFocus={onFocus}
           />
 
           <View style={styles.inputActions}>

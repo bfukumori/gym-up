@@ -44,6 +44,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.bfukumori.gymup",
+      "softwareKeyboardLayoutMode": "pan",
       "permissions": ["RECEIVE_BOOT_COMPLETED", "SCHEDULE_EXACT_ALARM", "POST_NOTIFICATIONS"]
     },
     "web": {
