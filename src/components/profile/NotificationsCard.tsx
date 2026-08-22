@@ -1,14 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import {
-  Modal,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { BorderRadius, Colors, Spacing, Typography } from '../../constants/theme';
 
 interface NotificationsCardProps {
@@ -164,9 +157,7 @@ export function NotificationsCard({
                     onPress={() => handleSelectPreset(preset)}
                     activeOpacity={0.7}
                   >
-                    <Text
-                      style={[styles.presetBtnText, isSelected && styles.presetBtnTextActive]}
-                    >
+                    <Text style={[styles.presetBtnText, isSelected && styles.presetBtnTextActive]}>
                       {preset}
                     </Text>
                   </TouchableOpacity>
@@ -461,4 +452,3 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 });
-

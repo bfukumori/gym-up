@@ -45,7 +45,7 @@ export function AppUpdateCard() {
                 try {
                   await Updates.fetchUpdateAsync();
                   await Updates.reloadAsync();
-                } catch (e) {
+                } catch {
                   Alert.alert('Erro', 'Não foi possível recarregar a atualização.');
                 }
               },
@@ -54,7 +54,10 @@ export function AppUpdateCard() {
         );
       } else {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        Alert.alert('App Atualizado', 'Você já está na versão mais recente disponível para este canal.');
+        Alert.alert(
+          'App Atualizado',
+          'Você já está na versão mais recente disponível para este canal.'
+        );
       }
     } catch (e) {
       console.log('Error checking updates:', e);
