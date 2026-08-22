@@ -1,16 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DEFAULT_PLANS, type DefaultPlanOption } from '../../constants/defaultPlans';
+import { DEFAULT_PLANS } from '../../constants/defaultPlans';
 import { BorderRadius, Colors, Spacing, Typography } from '../../constants/theme';
 import type { WorkoutPlan } from '../../types';
 
@@ -156,7 +149,13 @@ export function DefaultPlanSelectorModal({
             <View style={styles.highlightsBox}>
               <Text style={styles.highlightsTitle}>DESTAQUES DA FICHA:</Text>
               {currentOption.highlights.map((h, i) => (
-                <View key={`h-${i}`} style={styles.highlightRow}>
+                <View
+                  key={`h-${
+                    // biome-ignore lint/suspicious/noArrayIndexKey: <override>
+                    i
+                  }`}
+                  style={styles.highlightRow}
+                >
                   <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
                   <Text style={styles.highlightText}>{h}</Text>
                 </View>

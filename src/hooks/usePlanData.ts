@@ -13,10 +13,7 @@ export function usePlanData() {
   const [defaultPlansModalVisible, setDefaultPlansModalVisible] = useState(false);
 
   const loadPlan = useCallback(async () => {
-    const [saved, hasKey] = await Promise.all([
-      StorageService.getWorkoutPlan(),
-      hasGeminiApiKey(),
-    ]);
+    const [saved, hasKey] = await Promise.all([StorageService.getWorkoutPlan(), hasGeminiApiKey()]);
     setPlan(saved);
     setHasGeminiKey(hasKey);
   }, []);
@@ -35,22 +32,18 @@ export function usePlanData() {
 
   const handleResetPlan = () => {
     if (hasGeminiKey) {
-      Alert.alert(
-        'Alterar Ficha de Treino',
-        'Como deseja configurar sua nova rotina de treinos?',
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          {
-            text: 'Treino Padrão',
-            onPress: () => setDefaultPlansModalVisible(true),
-          },
-          {
-            text: 'Nova Ficha com IA',
-            style: 'default',
-            onPress: () => router.push('/onboarding/quiz'),
-          },
-        ]
-      );
+      Alert.alert('Alterar Ficha de Treino', 'Como deseja configurar sua nova rotina de treinos?', [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Treino Padrão',
+          onPress: () => setDefaultPlansModalVisible(true),
+        },
+        {
+          text: 'Nova Ficha com IA',
+          style: 'default',
+          onPress: () => router.push('/onboarding/quiz'),
+        },
+      ]);
     } else {
       setDefaultPlansModalVisible(true);
     }
@@ -70,4 +63,3 @@ export function usePlanData() {
     handleResetPlan,
   };
 }
-

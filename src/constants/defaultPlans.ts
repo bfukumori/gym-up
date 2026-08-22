@@ -79,7 +79,8 @@ export const DEFAULT_PLANS: Record<'beginner' | 'intermediate' | 'advanced', Def
               name: 'Puxada Frontal Aberta na Polia',
               muscleGroup: 'Costas (Dorsal)',
               equipment: 'Polia Alta',
-              notes: 'Puxe a barra em direção ao peitoral superior, sem inclinar o tronco excessivamente.',
+              notes:
+                'Puxe a barra em direção ao peitoral superior, sem inclinar o tronco excessivamente.',
               targetSets: [
                 { setNumber: 1, targetReps: '12-15', suggestedWeightKg: 25, restSeconds: 60 },
                 { setNumber: 2, targetReps: '10-12', suggestedWeightKg: 30, restSeconds: 60 },

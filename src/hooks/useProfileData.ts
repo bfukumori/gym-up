@@ -62,7 +62,10 @@ export function useProfileData() {
     await StorageService.saveCustomApiKey('');
     setCustomKey('');
     setIsSavedKey(false);
-    Alert.alert('Chave Removida', 'Sua chave do Gemini foi removida. O app utilizará os treinos padrão.');
+    Alert.alert(
+      'Chave Removida',
+      'Sua chave do Gemini foi removida. O app utilizará os treinos padrão.'
+    );
   };
 
   const handleEnableOrTestNotifications = async () => {

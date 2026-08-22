@@ -74,7 +74,10 @@ export function useQuizForm() {
       );
     } catch (error) {
       console.error(error);
-      Alert.alert('Erro ao Gerar Treino', 'Não foi possível conectar com o Gemini. Verifique sua chave API no Perfil.');
+      Alert.alert(
+        'Erro ao Gerar Treino',
+        'Não foi possível conectar com o Gemini. Verifique sua chave API no Perfil.'
+      );
     } finally {
       setLoading(false);
     }

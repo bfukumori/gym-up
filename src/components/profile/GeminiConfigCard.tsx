@@ -117,8 +117,8 @@ export function GeminiConfigCard({
 
         {hasKey && !isLikelyValidKey && (
           <Text style={styles.validationWarning}>
-            <Ionicons name="warning-outline" size={12} color={Colors.warning} /> A chave parece curta
-            ou incompleta. Verifique se copiou todo o código.
+            <Ionicons name="warning-outline" size={12} color={Colors.warning} /> A chave parece
+            curta ou incompleta. Verifique se copiou todo o código.
           </Text>
         )}
       </View>
@@ -136,16 +136,16 @@ export function GeminiConfigCard({
             color={!hasKey ? Colors.textSecondary : '#000000'}
           />
           <Text style={[styles.saveKeyBtnText, !hasKey && styles.saveKeyBtnTextMuted]}>
-            {isSavedKey ? 'Chave Salva com Sucesso ✓' : hasKey ? 'Salvar Chave API' : 'Salvar Alterações'}
+            {isSavedKey
+              ? 'Chave Salva com Sucesso ✓'
+              : hasKey
+                ? 'Salvar Chave API'
+                : 'Salvar Alterações'}
           </Text>
         </TouchableOpacity>
 
         {isSavedKey && hasKey && onRemoveKey && (
-          <TouchableOpacity
-            style={styles.removeKeyBtn}
-            onPress={onRemoveKey}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity style={styles.removeKeyBtn} onPress={onRemoveKey} activeOpacity={0.7}>
             <Ionicons name="trash-outline" size={16} color={Colors.danger} />
             <Text style={styles.removeKeyBtnText}>Remover</Text>
           </TouchableOpacity>
@@ -317,4 +317,3 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-

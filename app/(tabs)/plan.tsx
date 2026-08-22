@@ -65,7 +65,9 @@ export default function PlanScreen() {
               onPress={() => router.push('/(tabs)/profile')}
             >
               <Ionicons name="sparkles" size={14} color={Colors.accentBlue} />
-              <Text style={styles.secondaryLinkText}>Adicionar chave Gemini para IA personalizada</Text>
+              <Text style={styles.secondaryLinkText}>
+                Adicionar chave Gemini para IA personalizada
+              </Text>
             </TouchableOpacity>
           )}
         </View>
