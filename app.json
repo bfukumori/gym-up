@@ -47,6 +47,15 @@
       "softwareKeyboardLayoutMode": "pan",
       "permissions": ["RECEIVE_BOOT_COMPLETED", "SCHEDULE_EXACT_ALARM", "POST_NOTIFICATIONS"]
     },
+    "androidStatusBar": {
+      "backgroundColor": "#0B0E14",
+      "barStyle": "light-content",
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#0B0E14",
+      "barStyle": "light-content"
+    },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
