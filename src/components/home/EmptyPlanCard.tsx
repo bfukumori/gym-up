@@ -84,7 +84,7 @@ export function EmptyPlanCard({
           <TouchableOpacity
             activeOpacity={0.7}
             style={styles.secondaryBtn}
-            onPress={() => router.push('/(tabs)/profile')}
+            onPress={() => router.navigate('/(tabs)/profile')}
           >
             <Ionicons name="sparkles" size={14} color={Colors.accentBlue} />
             <Text style={styles.secondaryLinkText}>

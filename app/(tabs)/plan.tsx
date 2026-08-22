@@ -78,7 +78,7 @@ export default function PlanScreen() {
           onSelectPlan={handleSelectPlan}
           hasGeminiKey={hasGeminiKey}
           onOpenQuiz={() => router.push('/onboarding/quiz')}
-          onOpenProfile={() => router.push('/(tabs)/profile')}
+          onOpenProfile={() => router.navigate('/(tabs)/profile')}
         />
       </View>
     );
@@ -146,7 +146,7 @@ export default function PlanScreen() {
         onSelectPlan={handleSelectPlan}
         hasGeminiKey={hasGeminiKey}
         onOpenQuiz={() => router.push('/onboarding/quiz')}
-        onOpenProfile={() => router.push('/(tabs)/profile')}
+        onOpenProfile={() => router.navigate('/(tabs)/profile')}
       />
     </View>
   );

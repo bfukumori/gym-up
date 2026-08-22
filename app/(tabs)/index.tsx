@@ -98,7 +98,7 @@ export default function HomeScreen() {
         onSelectPlan={handleSelectPlan}
         hasGeminiKey={hasGeminiKey}
         onOpenQuiz={() => router.push('/onboarding/quiz')}
-        onOpenProfile={() => router.push('/(tabs)/profile')}
+        onOpenProfile={() => router.navigate('/(tabs)/profile')}
       />
     </View>
   );
