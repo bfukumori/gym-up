@@ -2,15 +2,18 @@ import { Observe, ObserveRoot, useObserve } from 'expo-observe';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Colors } from '../src/constants/theme';
 import { NotificationService } from '../src/services/notifications';
 
-Observe.configure({
-  integrations: { 'expo-router': true },
-});
+// Configure observe for startup metrics without locking route transitions
+Observe.configure({});
+
+// Set native window root background to dark theme (fixes white notch/cutout)
+SystemUI.setBackgroundColorAsync(Colors.background).catch(() => {});
 
 // Ensure splash screen is hidden safely without blocking UI
 SplashScreen.hideAsync().catch(() => {});
@@ -48,11 +51,8 @@ function RootLayout() {
         const check = await Updates.checkForUpdateAsync();
         if (check.isAvailable) {
           await Updates.fetchUpdateAsync();
-          // Update will be smoothly applied on next app launch or via manual button in Profile
         }
-      } catch {
-        // Ignore offline or dev errors
-      }
+      } catch {}
     };
 
     checkUpdates();
