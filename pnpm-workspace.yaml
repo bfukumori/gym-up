@@ -1,3 +1,5 @@
 allowBuilds:
-  '@google/genai': true
+  "@google/genai": true
   protobufjs: true
+overrides:
+  "uuid": "^14.0.2"
